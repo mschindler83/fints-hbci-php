@@ -18,6 +18,8 @@ class SEPAAccount
     protected $subAccount;
     /** @var string */
     protected $blz;
+    /** @var  boolean */
+    protected $sepaCapable;
 
     /**
      * Get iban
@@ -135,6 +137,39 @@ class SEPAAccount
     public function setBlz($blz)
     {
         $this->blz = (string) $blz;
+
+        return $this;
+    }
+    
+    /**
+     * Get sepaCapable
+     *
+     * @return boolean
+     */
+    public function isSepaCapable()
+    {
+        return $this->sepaCapable;
+    }
+
+    /**
+     * Set sepaCapable
+     *
+     * @param $sepaCapable
+     *
+     * @return $this
+     */
+    public function setSepaCapable($sepaCapable)
+    {
+        if(is_string($sepaCapable)) {
+            if('J' == $sepaCapable) {
+                $sepaCapable = true;
+            }
+            else {
+                $sepaCapable = false;
+            }
+        }
+
+        $this->sepaCapable = $sepaCapable;
 
         return $this;
     }
