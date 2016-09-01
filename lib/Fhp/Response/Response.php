@@ -81,10 +81,11 @@ class Response
      * @param AbstractMessage $message
      * @return array
      */
-    public function getTouchDowns(AbstractMessage $message)
+    public function getTouchdowns(AbstractMessage $message)
     {
         $touchdown = array();
         $messageSegments = $message->getEncryptedSegments();
+
         /** @var AbstractSegment $msgSeg */
         foreach ($messageSegments as $msgSeg) {
             $segment = $this->findSegmentForReference('HIRMS', $msgSeg);
@@ -101,7 +102,7 @@ class Response
                 }
             }
         }
-
+        
         return $touchdown;
     }
 
