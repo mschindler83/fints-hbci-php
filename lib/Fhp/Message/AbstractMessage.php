@@ -9,7 +9,7 @@ use Fhp\Segment\SegmentInterface;
  * Class AbstractMessage
  * @package Fhp\Message
  */
-class AbstractMessage
+abstract class AbstractMessage implements EncryptedSegment
 {
     const MSG_HEADER_SEGMENT = 'HNHBK';
     const MSG_HEADER_VERSION = 3;
