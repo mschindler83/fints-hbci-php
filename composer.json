@@ -1,5 +1,5 @@
 {
-  "name": "mschindler83/fints-hbci-php",
+  "name": "sleuters/fints-hbci-php",
   "description": "PHP Library for the protocols fints and hbci",
   "homepage": "http://fints-hbci-php.markus-schindler.de",
   "version": "1.0.0",
@@ -11,7 +11,7 @@
   },
   "require": {
     "php": ">=5.3.2",
-    "monolog/monolog": "^1.18"
+    "monolog/monolog": "^1.21"
   },
   "require-dev": {
   }
