@@ -53,9 +53,14 @@ class MT940
     protected function parseToArray()
     {
         $result = array();
-        $days = explode("\r\n-", $this->rawData);
+        $replacePattern = '/(?!@@-)(?!@@:)(@@)/';
+        $this->rawData = preg_replace($replacePattern, '', $this->rawData);
+        $pattern = '/(\r\n-)|(@@-)/';
+        $days = preg_split($pattern, $this->rawData);
+
         foreach ($days as &$day) {
-            $day = explode("\r\n:", $day);
+            $pattern = '/(\r\n:)|(@@:)/';
+            $day = preg_split($pattern, $day);
             // remove not so important data
             array_shift($day);
             array_shift($day);
@@ -129,6 +134,9 @@ class MT940
             }
         }
 
+
+        echo "<pre>";
+        print_r($result);
         return $result;
     }
 
