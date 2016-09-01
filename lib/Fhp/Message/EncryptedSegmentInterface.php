@@ -11,7 +11,7 @@ use Fhp\Segment\HNVSD;
 use Fhp\Segment\HNVSK;
 use Fhp\Segment\SegmentInterface;
 
-interface EncryptedSegment {
+interface EncryptedSegmentInterface {
 
     public function getEncryptedSegments();
 }
