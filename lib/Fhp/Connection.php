@@ -33,7 +33,7 @@ class Connection
      */
     public function send(AbstractMessage $message)
     {
-        return iconv('ISO-8859-1', 'UTF-8', $this->adapter->send($message));
+        return $this->adapter->send($message);
     }
 
     /**

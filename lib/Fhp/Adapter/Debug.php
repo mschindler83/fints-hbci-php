@@ -47,10 +47,15 @@ class Debug implements AdapterInterface
      * @param AbstractMessage $message
      * @return string
      */
-    public function send(AbstractMessage $message)
+    public function send(AbstractMessage $message, $inputCharset = null, $outputCharset = null)
     {
+        if($inputCharset && $outputCharset) {
+            $message = iconv($inputCharset, $outputCharset, $message);
+        }
         /* @todo Implement me
          * return file_get_contents(__DIR__ . '/../../../develop/accounts_response.txt');
          */
     }
+
+
 }

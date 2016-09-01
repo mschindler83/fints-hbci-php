@@ -70,8 +70,12 @@ class Curl implements AdapterInterface
      * @return string
      * @throws CurlException
      */
-    public function send(AbstractMessage $message)
+    public function send(AbstractMessage $message, $inputCharset = null, $outputCharset = null)
     {
+        if($inputCharset && $outputCharset) {
+            $message = iconv($inputCharset, $outputCharset, $message);
+        }
+        
         curl_setopt($this->curlHandle, CURLOPT_POSTFIELDS, base64_encode($message->toString()));
         $response = curl_exec($this->curlHandle);
         $this->lastResponseInfo = curl_getinfo($this->curlHandle);
