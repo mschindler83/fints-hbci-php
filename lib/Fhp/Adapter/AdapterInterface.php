@@ -14,5 +14,5 @@ interface AdapterInterface
      * @param AbstractMessage $message
      * @return string
      */
-    public function send(AbstractMessage $message, $inputCharset = null, $outputCharset = null);
+    public function send(AbstractMessage $message, $inputCharset = 'ISO-8859-1', $outputCharset = 'UTF-8');
 }

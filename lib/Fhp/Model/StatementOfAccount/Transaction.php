@@ -176,6 +176,8 @@ class Transaction
      */
     public function getBookingText()
     {
+
+
         return $this->bookingText;
     }
 
@@ -311,5 +313,25 @@ class Transaction
         $this->name = (string) $name;
 
         return $this;
+    }
+    
+    public function __toString()
+    {
+        $dateFormat = 'd.m.Y';
+        
+        $properties = array(
+            $this->getName(),
+            $this->getAccountNumber(),
+            $this->getBankCode(),
+            $this->getAmount(),
+            $this->getCreditDebit(),
+            $this->getBookingText(),
+            $this->getDescription1(),
+            $this->getDescription2(),
+            $this->getBookingDate() ? $this->getBookingDate()->format($dateFormat) : null,
+            $this->getValutaDate() ? $this->getValutaDate()->format($dateFormat) : null
+        );
+
+        return implode(',', $properties);
     }
 }

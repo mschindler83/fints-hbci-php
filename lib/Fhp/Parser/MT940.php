@@ -139,10 +139,7 @@ class MT940
                 }
             }
         }
-
-
-        echo "<pre>";
-        print_r($result);
+        
         return $result;
     }
 

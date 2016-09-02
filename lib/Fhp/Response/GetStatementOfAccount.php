@@ -52,23 +52,25 @@ class GetStatementOfAccount extends Response
      */
     public static function createModelFromArray(array $array)
     {
+        
         if (empty($array)) {
             return null;
         }
+
 
         $soa = new StatementOfAccount();
 
         foreach ($array as $date => $statement) {
             $statementModel = new Statement();
-            $statementModel->setDate(new \DateTime($date));
+            $statementModel->setDate($date ? new \DateTime($date) : null);
             $statementModel->setStartBalance((float) $statement['start_balance']['amount']);
             $statementModel->setCreditDebit($statement['start_balance']['credit_debit']);
 
             if (isset($statement['transactions'])) {
                 foreach ($statement['transactions'] as $trx) {
                     $transaction = new Transaction();
-                    $transaction->setBookingDate(new \DateTime($trx['booking_date']));
-                    $transaction->setValutaDate(new \DateTime($trx['valuta_date']));
+                    $transaction->setBookingDate($trx['booking_date'] ? new \DateTime($trx['booking_date']) : null);
+                    $transaction->setValutaDate($trx['valuta_date'] ? new \DateTime($trx['valuta_date']) : null);
                     $transaction->setCreditDebit($trx['credit_debit']);
                     $transaction->setAmount($trx['amount']);
                     $transaction->setBookingText($trx['description']['booking_text']);

@@ -191,7 +191,7 @@ class FinTs
             );
 
             $r = $dialog->sendMessage($message);
-            $touchdowns = $r->getTouchDowns($message);
+            $touchdowns = $r->getTouchdowns($message);
             $responses[] = new GetStatementOfAccount($r->rawResponse);
         }
 
@@ -199,10 +199,12 @@ class FinTs
         $this->logger->debug('HKKAZ response:');
         $masterArray = array();
 
+
         /** @var GetStatementOfAccount $r */
         foreach ($responses as $r) {
             $masterArray += $r->getStatementOfAccountArray();
         }
+
 
         $dialog->endDialog();
         return GetStatementOfAccount::createModelFromArray($masterArray);
@@ -221,7 +223,7 @@ class FinTs
      */
     protected function createStateOfAccountMessage(
         Dialog $dialog,
-        SepaAccount $account,
+        SEPAAccount $account,
         \DateTime $from,
         \DateTime $to,
         $touchdown = null

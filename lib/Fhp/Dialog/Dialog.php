@@ -120,6 +120,7 @@ class Dialog
 
             $result = $this->connection->send($message);
             $this->messageNumber++;
+            $result = utf8_encode($result);
             $response = new Response($result);
 
             $this->handleResponse($response);
