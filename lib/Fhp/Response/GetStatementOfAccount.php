@@ -69,16 +69,19 @@ class GetStatementOfAccount extends Response
             if (isset($statement['transactions'])) {
                 foreach ($statement['transactions'] as $trx) {
                     $transaction = new Transaction();
-                    $transaction->setBookingDate($trx['booking_date'] ? new \DateTime($trx['booking_date']) : null);
-                    $transaction->setValutaDate($trx['valuta_date'] ? new \DateTime($trx['valuta_date']) : null);
-                    $transaction->setCreditDebit($trx['credit_debit']);
-                    $transaction->setAmount($trx['amount']);
-                    $transaction->setBookingText($trx['description']['booking_text']);
-                    $transaction->setDescription1($trx['description']['description_1']);
-                    $transaction->setDescription2($trx['description']['description_2']);
-                    $transaction->setBankCode($trx['description']['bank_code']);
-                    $transaction->setAccountNumber($trx['description']['account_number']);
-                    $transaction->setName($trx['description']['name']);
+                    $transaction
+                        ->setBookingDate($trx['booking_date'] ? new \DateTime($trx['booking_date']) : null)
+                        ->setValutaDate($trx['valuta_date'] ? new \DateTime($trx['valuta_date']) : null)
+                        ->setCreditDebit($trx['credit_debit'])
+                        ->setAmount($trx['amount'])
+                        ->setBookingText($trx['description']['booking_text'])
+                        ->setDescription1($trx['description']['description_1'])
+                        ->setDescription2($trx['description']['description_2'])
+                        ->setReferencePropertiesByDescription(sprintf('%s%s', $trx['description']['description_1'], $trx['description']['description_2']))
+                        ->setBankCode($trx['description']['bank_code'])
+                        ->setAccountNumber($trx['description']['account_number'])
+                        ->setName($trx['description']['name']);
+
                     $statementModel->addTransaction($transaction);
                 }
             }
@@ -87,6 +90,4 @@ class GetStatementOfAccount extends Response
 
         return $soa;
     }
-
-
 }
