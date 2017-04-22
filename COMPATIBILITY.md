@@ -994,7 +994,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Weserbergland
 - [ ] Sparkasse Westerwald-Sieg
 - [ ] Sparkasse Westholstein
-- [ ] Sparkasse Westmünsterland
+- [x] Sparkasse Westmünsterland
 - [ ] Sparkasse Wetzlar
 - [ ] Sparkasse Wilhelmshaven
 - [ ] Sparkasse Wittenberg
@@ -1166,7 +1166,7 @@ This library is verified to work with following banks.
 - [ ] Volksbank Baiersbronn
 - [ ] Volksbank Bakum eG
 - [ ] Volksbank Balingen
-- [ ] Volksbank Baumberge eG
+- [x] Volksbank Baumberge eG
 - [ ] Volksbank Bautzen
 - [ ] Volksbank Bechtheim
 - [ ] Volksbank Beckum eG.
@@ -1286,7 +1286,7 @@ This library is verified to work with following banks.
 - [ ] Volksbank Greven eG
 - [ ] Volksbank Grevenbrück eG
 - [x] Volksbank Griesheim
-- [ ] Volksbank Gronau-Ahaus eG
+- [x] Volksbank Gronau-Ahaus eG
 - [ ] Volksbank Günzburg
 - [ ] Volksbank Gütersloh eG
 - [ ] Volksbank Haaren eG
