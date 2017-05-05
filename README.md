@@ -38,3 +38,7 @@ If you plan to contribute to this library, please ensure that you stick with the
 You can find the PHP Standard Recommendations [here](http://www.php-fig.org/psr/)
 
 ### Have fun!
+
+Looking for a direct wire transfer online payment solution?
+
+Checkout https://www.konto-secure.de
