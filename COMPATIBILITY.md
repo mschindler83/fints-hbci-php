@@ -340,7 +340,7 @@ This library is verified to work with following banks.
 - [ ] Raiffeisen-Volksbank Kronach-Ludwigsstadt
 - [ ] Raiffeisen-Volksbank Lichtenfels-Itzgrund
 - [ ] Raiffeisen-Volksbank Miltenberg
-- [ ] Raiffeisen-Volksbank Neuburg/Donau
+- [X] Raiffeisen-Volksbank Neuburg/Donau eG
 - [ ] Raiffeisen-Volksbank Neustadt eG
 - [ ] Raiffeisen-Volksbank Oder-Spree eG
 - [ ] Raiffeisen-Volksbank Quedlinburg-Aschersleben eG
@@ -802,7 +802,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Dieburg
 - [ ] Sparkasse Dillenburg
 - [ ] Sparkasse Dinslaken-Voerde-Hünxe
-- [ ] Sparkasse Donauwörth
+- [X] Sparkasse Donauwörth
 - [ ] Sparkasse Donnersberg
 - [ ] Sparkasse Dortmund
 - [ ] Sparkasse Duderstadt
