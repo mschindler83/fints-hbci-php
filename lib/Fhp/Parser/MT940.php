@@ -56,7 +56,7 @@ class MT940
         $divider = substr_count($this->rawData, "\r\n-") > substr_count($this->rawData, '@@-') ? "\r\n" : '@@';
 
         $result = array();
-        $days = explode($divider . '-', $this->rawData);
+        $days = preg_split('%' . $divider . '-$%', $this->rawData);
         foreach ($days as &$day) {
             $day = explode($divider . ':', $day);
             for ($i = 0, $cnt = count($day); $i < $cnt; $i++) {
