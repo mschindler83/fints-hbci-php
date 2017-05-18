@@ -16,7 +16,7 @@ This library is verified to work with following banks.
 - [ ] Allgäuer Volksbank Kempten-Sonthofen
 - [ ] Allianz-Bank (Zndl der Oldenburgische Landesbank AG)
 - [ ] Augsburger Aktienbank AG
-- [ ] Augusta-Bank Raiffeisen-Volksbank
+- [x] Augusta-Bank Raiffeisen-Volksbank
 - [ ] Bad Waldseer Bank
 - [ ] Baden-Württembergische Bank (BW-Bank)
 - [ ] BAG Bankaktiengesellsch. Hamm
