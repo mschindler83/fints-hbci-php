@@ -855,7 +855,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Herford
 - [ ] Sparkasse Hilden-Ratingen-Velbert 
 - [ ] Sparkasse Hildesheim
-- [ ] Sparkasse Hochfranken
+- [x] Sparkasse Hochfranken
 - [ ] Sparkasse Hochrhein
 - [ ] Sparkasse Hochsauerland
 - [ ] Sparkasse Hochschwarzwald
