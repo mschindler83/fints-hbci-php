@@ -356,7 +356,7 @@ This library is verified to work with following banks.
 - [ ] Raiffeisenbank Aiglsbach
 - [ ] Raiffeisenbank Aitrang-Ruderatshofen
 - [ ] Raiffeisenbank Alsheim-Gimbsheim
-- [ ] Raiffeisenbank Altdorf-Ergolding
+- [X] Raiffeisenbank Altdorf-Ergolding
 - [ ] Raiffeisenbank Altdorf-Feucht
 - [ ] Raiffeisenbank Alteglofsheim-Hagelstadt
 - [ ] Raiffeisenbank Altschweier
