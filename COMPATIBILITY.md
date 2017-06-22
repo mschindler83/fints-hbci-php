@@ -929,7 +929,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Nürnberg
 - [ ] Sparkasse Oberhessen
 - [ ] Sparkasse Oberlausitz-Niederschlesien
-- [ ] Sparkasse Oberpfalz-Nord
+- [x] Sparkasse Oberpfalz-Nord
 - [ ] Sparkasse Odenwaldkreis
 - [ ] Sparkasse Oder-Spree
 - [ ] Sparkasse Offenbach
