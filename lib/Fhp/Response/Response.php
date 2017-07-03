@@ -157,7 +157,7 @@ class Response
      */
     public function getHkkddMaxVersion()
     {
-        return $this->getSegmentMaxVersion('HKKDD');
+        return $this->getSegmentMaxVersion('HIKDDS');
     }
 
     /**
