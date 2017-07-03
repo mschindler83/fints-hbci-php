@@ -206,6 +206,21 @@ class FinTs
     }
 
     /**
+     * Checks if current bank supports fetching of customer details.
+     *
+     * @return bool
+     */
+    public function isFetchingCustomerDetailsSupported()
+    {
+        $dialog = $this->getDialog();
+        $dialog->syncDialog();
+
+        $isSupported = $dialog->getHkkddMaxVersion() === 0 ? false : true;
+
+        return $isSupported;
+    }
+
+    /**
      * Helper method to create a "Statement of Account Message".
      *
      * @param Dialog $dialog

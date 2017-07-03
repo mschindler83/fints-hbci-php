@@ -153,6 +153,14 @@ class Response
     }
 
     /**
+     * @return int
+     */
+    public function getHkkddMaxVersion()
+    {
+        return $this->getSegmentMaxVersion('HKKDD');
+    }
+
+    /**
      * Checks if request / response was successful.
      *
      * @return bool
@@ -219,7 +227,7 @@ class Response
      */
     public function getSegmentMaxVersion($segmentName)
     {
-        $version = 3;
+        $version = 0;
         $segments = $this->findSegments($segmentName);
         foreach ($segments as $s) {
             $parts = $this->splitSegment($s);

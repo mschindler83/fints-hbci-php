@@ -85,6 +85,11 @@ class Dialog
     protected $hkkazVersion = 6;
 
     /**
+     * @var int
+     */
+    protected $hkkddVersion = 0;
+
+    /**
      * Dialog constructor.
      *
      * @param Connection $connection
@@ -244,6 +249,16 @@ class Dialog
     }
 
     /**
+     * Gets the max possible HKKDD version.
+     *
+     * @return int
+     */
+    public function getHkkddMaxVersion()
+    {
+        return $this->hkkddVersion;
+    }
+
+    /**
      * Gets the bank name.
      *
      * @return string
@@ -337,6 +352,9 @@ class Dialog
 
         // max version for segment HKKAZ (Kontoumsätze anfordern / Zeitraum)
         $this->hkkazVersion = $response->getHkkazMaxVersion();
+
+        // max version for segment HKKDD (Anzeige Kundendaten)
+        $this->hkkddVersion = $response->getHkkddMaxVersion();
 
         $this->logger->info('Received system id: ' . $response->getSystemId());
         $this->logger->info('Received dialog id: ' . $response->getDialogId());
