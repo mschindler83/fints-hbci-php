@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/travis/mschindler83/fints-hbci-php/master.svg)](https://travis-ci.org/mschindler83/fints-hbci-php)
 [![Latest Stable Version](https://img.shields.io/packagist/v/mschindler83/fints-hbci-php.svg)](https://packagist.org/packages/mschindler83/fints-hbci-php)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/mschindler83/fints-hbci-php.svg)](https://scrutinizer-ci.com/g/mschindler83/fints-hbci-php/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dm/mschindler83/fints-hbci-php.svg)](https://packagist.org/packages/mschindler83/fints-hbci-php)
+[![Monthly Downloads](https://img.shields.io/packagist/dm/mschindler83/fints-hbci-php.svg)](https://packagist.org/packages/mschindler83/fints-hbci-php)
 [![License](https://img.shields.io/github/license/mschindler83/fints-hbci-php.svg)](https://github.com/mschindler83/fints-hbci-php/blob/master/LICENSE)
 
 A PHP library implementing the basics of the FinTS / HBCI protocol.
