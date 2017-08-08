@@ -1,10 +1,10 @@
 # FinTS HBCI PHP
 
-[![Build Status](https://travis-ci.org/mschindler83/fints-hbci-php.svg?branch=master)](https://travis-ci.org/mschindler83/fints-hbci-php)
-[![Latest Stable Version](https://poser.pugx.org/mschindler83/fints-hbci-php/v/stable)](https://packagist.org/packages/mschindler83/fints-hbci-php)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mschindler83/fints-hbci-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mschindler83/fints-hbci-php/?branch=master)
-[![Monthly Downloads](https://poser.pugx.org/mschindler83/fints-hbci-php/d/monthly)](https://packagist.org/packages/mschindler83/fints-hbci-php)
-[![License](https://poser.pugx.org/mschindler83/fints-hbci-php/license)](https://packagist.org/packages/mschindler83/fints-hbci-php)
+[![Build Status](https://img.shields.io/travis/mschindler83/fints-hbci-php/master.svg)](https://travis-ci.org/mschindler83/fints-hbci-php)
+[![Latest Stable Version](https://img.shields.io/packagist/v/mschindler83/fints-hbci-php.svg)](https://packagist.org/packages/mschindler83/fints-hbci-php)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/mschindler83/fints-hbci-php.svg)](https://scrutinizer-ci.com/g/mschindler83/fints-hbci-php/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dm/mschindler83/fints-hbci-php.svg)](https://packagist.org/packages/mschindler83/fints-hbci-php)
+[![License](https://img.shields.io/github/license/mschindler83/fints-hbci-php.svg)](https://github.com/mschindler83/fints-hbci-php/blob/master/LICENSE)
 
 A PHP library implementing the basics of the FinTS / HBCI protocol.
 It can be used to fetch the balance of connected bank accounts and for fetching bank statements of accounts.
@@ -13,8 +13,9 @@ It can be used to fetch the balance of connected bank accounts and for fetching 
 
 Install via composer:
 
-    composer require mschindler83/fints-hbci-php
-
+```bash
+composer require mschindler83/fints-hbci-php
+```
 
 ## How to use it
 
