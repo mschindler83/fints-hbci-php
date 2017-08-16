@@ -68,6 +68,11 @@ class Transaction
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $satzart;
+
+    /**
      * Get booking date.
      *
      * @deprecated Use getBookingDate() instead
@@ -356,4 +361,19 @@ class Transaction
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getSatzart() {
+        return $this->satzart;
+    }
+
+    /**
+     * @param string $satzart
+     */
+    public function setSatzart($satzart) {
+        $this->satzart = $satzart;
+    }
+
 }

@@ -57,12 +57,17 @@ class MT940
 
         $result = array();
         $days = preg_split('%' . $divider . '-$%', $this->rawData);
+        $satzart = '';
         foreach ($days as &$day) {
             $day = explode($divider . ':', $day);
             for ($i = 0, $cnt = count($day); $i < $cnt; $i++) {
+                if (preg_match('/^20:/', $day[$i])) {
+                    // Satzart
+                    $satzart = substr($day[$i], 3);
+                }
                 // handle start balance
                 // 60F:C160401EUR1234,56
-                if (preg_match('/^60(F|M):/', $day[$i])) {
+                elseif (preg_match('/^60(F|M):/', $day[$i])) {
                     // remove 60(F|M): for better parsing
                     $day[$i] = substr($day[$i], 4);
                     $this->soaDate = $this->getDate(substr($day[$i], 1, 6));
@@ -132,7 +137,7 @@ class MT940
 
                     $trx[count($trx) - 1]['booking_date'] = $bookingDate;
                     $trx[count($trx) - 1]['valuta_date'] = $valutaDate;
-                }
+                    $trx[count($trx) - 1]['satzart'] = $satzart;                }
             }
         }
 
