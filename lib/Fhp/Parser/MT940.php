@@ -155,7 +155,7 @@ class MT940
 
         $descr = str_replace("\r\n", '', $descr);
         $descr = str_replace('? ', '?', $descr);
-        preg_match_all('/\?(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
+        preg_match_all('/\?[\r\n]*(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
 
         $descriptionLines = array();
         $description1 = ''; // Legacy, could be removed.
