@@ -220,7 +220,7 @@ This library is verified to work with following banks.
 - [ ] Kreissparkasse Ostalb (Aalen)
 - [ ] Kreissparkasse Osterholz
 - [ ] Kreissparkasse Peine
-- [ ] Kreissparkasse Ravensburg
+- [x] Kreissparkasse Ravensburg
 - [ ] Kreissparkasse Recklinghausen
 - [ ] Kreissparkasse Reutlingen
 - [ ] Kreissparkasse Rhein-Hunsrück
