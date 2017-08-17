@@ -822,7 +822,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Essen 
 - [ ] Sparkasse Finnentrop
 - [ ] Sparkasse Forchheim
-- [ ] Sparkasse Freiburg - Nördlicher Breisgau
+- [X] Sparkasse Freiburg - Nördlicher Breisgau
 - [ ] Sparkasse Freising
 - [ ] Sparkasse Freyung-Grafenau
 - [ ] Sparkasse Fröndenberg
