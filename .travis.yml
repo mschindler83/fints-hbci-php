@@ -1,12 +1,36 @@
 language: php
-install: composer install
-script:
-  - ./phplint.sh ./lib/
-  - ./vendor/phpunit/phpunit/phpunit
+
+## Run on container environment
+sudo: false
+
+## Cache composer bits
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+## List all PHP versions to test with
 php:
-  - '5.4'
-  - '5.5'
-  - '5.6'
-  - '7.0'
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
   - hhvm
   - nightly
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: nightly
+    - php: hhvm
+
+## Install Dependencies
+install:
+  - composer self-update
+  - if [ -n "$GH_TOKEN" ]; then composer config github-oauth.github.com ${GH_TOKEN}; fi;
+  - composer install --prefer-dist --no-interaction
+
+## Run test Scripts
+script:
+  - ./phplint.sh ./lib/
+  - vendor/bin/phpunit
