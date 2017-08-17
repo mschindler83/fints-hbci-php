@@ -153,6 +153,7 @@ class MT940
             $prepared[$i] = null;
         }
 
+        $descr = str_replace("\r\n", '', $descr);
         $descr = str_replace('? ', '?', $descr);
         preg_match_all('/\?(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
 
@@ -167,7 +168,7 @@ class MT940
                 } else {
                     $description2 .= $m[2];
                 }
-                $m[2] = trim(str_replace("\r\n", '', $m[2]));
+                $m[2] = trim($m[2]);
                 if (!empty($m[2])) {
                     $descriptionLines[] = $m[2];
                 }
@@ -203,14 +204,14 @@ class MT940
         }
 
         $result['description']       = $description;
-        $result['booking_text']      = trim(str_replace("\r\n", '', $prepared[0]));
-        $result['primanoten_nr']     = trim(str_replace("\r\n", '', $prepared[10]));
-        $result['description_1']     = trim(str_replace("\r\n", '', $description1));
-        $result['bank_code']         = trim(str_replace("\r\n", '', $prepared[30]));
-        $result['account_number']    = trim(str_replace("\r\n", '', $prepared[31]));
-        $result['name']              = trim(str_replace("\r\n", '', $prepared[32] . $prepared[33]));
-        $result['text_key_addition'] = trim(str_replace("\r\n", '', $prepared[34]));
-        $result['description_2']     = trim(str_replace("\r\n", '', $description2));
+        $result['booking_text']      = trim($prepared[0]);
+        $result['primanoten_nr']     = trim($prepared[10]);
+        $result['description_1']     = trim($description1);
+        $result['bank_code']         = trim($prepared[30]);
+        $result['account_number']    = trim($prepared[31]);
+        $result['name']              = trim($prepared[32] . $prepared[33]);
+        $result['text_key_addition'] = trim($prepared[34]);
+        $result['description_2']     = trim($description2);
 
         return $result;
     }
