@@ -271,7 +271,7 @@ This library is verified to work with following banks.
 - [ ] Merkur Bank
 - [ ] Mittelbrandenburgische Sparkasse in Potsdam
 - [ ] MKB Mittelstandskreditbank Aktiengesellschaft
-- [ ] MLP Finanzdienstleistungen
+- [x] MLP Finanzdienstleistungen
 - [ ] MLP Finanzdienstleistungen Zw CS
 - [ ] Münchner Bank
 - [ ] Münsterländische Bank Thie & Co
