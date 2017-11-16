@@ -300,8 +300,8 @@ This library is verified to work with following banks.
 - [ ] Paffrather RB eG
 - [ ] Pax Bank
 - [ ] PayCenter GmbH
-- [ ] Postbank
-- [ ] Postbank (Giro)
+- [x] Postbank
+- [x] Postbank (Giro)
 - [x] Postbank Geschäftskunden
 - [x] PSD Bank Berlin-Brandenburg
 - [x] PSD Bank Braunschweig
