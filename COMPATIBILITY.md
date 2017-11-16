@@ -46,7 +46,7 @@ This library is verified to work with following banks.
 - [ ] Bankverein Bebra
 - [ ] Bankverein Werther AG
 - [ ] Bayerische Landesbank Girozentrale
-- [ ] BBBank
+- [x] BBBank
 - [ ] Bensberger Bank eG
 - [ ] Berkheimer Bank
 - [ ] Berliner Sparkasse
