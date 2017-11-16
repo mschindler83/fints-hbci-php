@@ -761,7 +761,7 @@ This library is verified to work with following banks.
 - [ ] Sparda-Bank West eG
 - [ ] SparDaKa Brachelen eG
 - [ ] Spardaka Hoengen eG
-- [ ] Sparkasse Aachen 
+- [x] Sparkasse Aachen 
 - [ ] Sparkasse Allgäu (Kempten)
 - [ ] Sparkasse Altenburger Land
 - [ ] Sparkasse Altmark-West
