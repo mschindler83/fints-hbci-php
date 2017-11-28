@@ -125,8 +125,7 @@ class MT940
                         // if valuta date is earlier than booking date, then it must be in the new year.
                         if (substr($transaction, 2, 2) == '12' && substr($transaction, 6, 2) == '01') {
                             $year++;
-                        }
-                        elseif (substr($transaction, 2, 2) == '01' && substr($transaction, 6, 2) == '12') {
+                        } elseif (substr($transaction, 2, 2) == '01' && substr($transaction, 6, 2) == '12') {
                             $year--;
                         }
                         $bookingDate = $this->getDate($year . $bookingDate);
