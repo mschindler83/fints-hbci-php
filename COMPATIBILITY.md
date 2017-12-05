@@ -256,7 +256,7 @@ This library is verified to work with following banks.
 - [ ] Landesbank Baden-Württemberg
 - [ ] Landesbank Berlin AG
 - [ ] Landeskirchliche Kredit-Genossenschaft Sachsen
-- [ ] Landessparkasse zu Oldenburg
+- [x] Landessparkasse zu Oldenburg
 - [ ] Landsberg-Ammersee Bank
 - [ ] Leutkircher Bank Raiffeisen- und Volksbank
 - [ ] LevoBank Vereinte VB Lebach Eppelborn
