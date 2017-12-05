@@ -48,7 +48,7 @@ class Transaction
 
     /**
      * Array keys are identifiers like "SVWZ" for the main description.
-     * @var array
+     * @var string[]
      */
     protected $structuredDescription;
 
@@ -250,7 +250,7 @@ class Transaction
     /**
      * Get structuredDescription
      *
-     * @return array
+     * @return string[]
      */
     public function getStructuredDescription()
     {
@@ -260,7 +260,7 @@ class Transaction
     /**
      * Set structuredDescription
      *
-     * @param array $structuredDescription
+     * @param string[] $structuredDescription
      *
      * @return $this
      */
