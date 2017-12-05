@@ -253,7 +253,7 @@ This library is verified to work with following banks.
 - [ ] Kurhessische Landbank
 - [ ] Kyffhäusersparkasse Artern-Sondershausen
 - [ ] Landbank Horlofftal
-- [ ] Landesbank Baden-Württemberg
+- [x] Landesbank Baden-Württemberg
 - [ ] Landesbank Berlin AG
 - [ ] Landeskirchliche Kredit-Genossenschaft Sachsen
 - [x] Landessparkasse zu Oldenburg
