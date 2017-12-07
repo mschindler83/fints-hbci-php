@@ -27,7 +27,7 @@ class MT940Test extends \PHPUnit_Framework_TestCase
 		$parser = new MT940(implode("\r\n", $rawData));
 		$result = $parser->parse(MT940::TARGET_ARRAY);
 		$this->assertEquals(
-			'EREF+CCB.122.UE.266455SVWZ+Re 17-H-0005 vom 24.04.2017',
+            'EREF+CCB.122.UE.266455' . PHP_EOL . 'SVWZ+Re 17-H-0005 vom 24.04' . PHP_EOL . '.2017',
 			$result['2017-04-28']['transactions'][0]['description']['description_1']
 		);
 	}
