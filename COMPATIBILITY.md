@@ -732,7 +732,7 @@ This library is verified to work with following banks.
 - [ ] SpaDaka Aegidienberg eG
 - [ ] Spadaka Bockum-Hövel eG.
 - [ ] Spadaka Gescher eG
-- [ ] Spadaka Minden-Porta Westfalica
+- [x] Spadaka Minden-Porta Westfalica (Volksbank Mindener Land eG)
 - [ ] Spadaka Reken eG.
 - [x] Spar- u Kreditbank ev-freikirchl Gemeinden
 - [ ] Spar- und Darlehnskasse Börde Lamstedt-Hechthausen
