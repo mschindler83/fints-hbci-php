@@ -40,6 +40,5 @@ You can find the PHP Standard Recommendations [here](http://www.php-fig.org/psr/
 
 ### Have fun!
 
-Looking for a direct wire transfer online payment solution?
-
-Checkout https://www.konto-secure.de
+Looking for a PRO Version which is capable of doing transactions?
+Checkout http://fints-hbci-php.markus-schindler.de/pro.html
