@@ -972,7 +972,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Sonneberg
 - [ ] Sparkasse Spree-Neiße
 - [ ] Sparkasse Stade-Altes Land
-- [ ] Sparkasse Starkenburg
+- [x] Sparkasse Starkenburg
 - [ ] Sparkasse Staufen-Breisach
 - [ ] Sparkasse Stockach
 - [ ] Sparkasse Straelen
