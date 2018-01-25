@@ -14,6 +14,8 @@ class MT940
 
     const CD_CREDIT = 'credit';
     const CD_DEBIT = 'debit';
+    const CD_CREDIT_CANCELLATION = 'credit_cancellation';
+    const CD_DEBIT_CANCELLATION = 'debit_cancellation';
 
     /** @var string */
     protected $rawData;
@@ -98,12 +100,22 @@ class MT940
                     $trx = &$result[$this->soaDate]['transactions'];
 
                     preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)([A-Z]{1})?([^N]+)N/', $transaction, $trxMatch);
-                    if ($trxMatch[2] == 'C') {
-                        $trx[count($trx)]['credit_debit'] = static::CD_CREDIT;
-                    } elseif ($trxMatch[2] == 'D') {
-                        $trx[count($trx)]['credit_debit'] = static::CD_DEBIT;
-                    } else {
-                        throw new MT940Exception('cd mark not found in: ' . $transaction);
+
+                    switch($trxMatch[2]) {
+                        case 'C':
+                            $trx[count($trx)]['credit_debit'] = static::CD_CREDIT;
+                            break;
+                        case 'D':
+                            $trx[count($trx)]['credit_debit'] = static::CD_DEBIT;
+                            break;
+                        case 'RC':
+                            $trx[count($trx)]['credit_debit'] = static::CD_CREDIT_CANCELLATION;
+                            break;
+                        case 'RD':
+                            $trx[count($trx)]['credit_debit'] = static::CD_DEBIT_CANCELLATION;
+                            break;
+                        default:
+                            throw new MT940Exception('cd mark not found in: ' . $transaction);
                     }
 
                     $amount = $trxMatch[4];
