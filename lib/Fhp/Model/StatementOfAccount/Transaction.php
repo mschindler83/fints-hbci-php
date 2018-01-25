@@ -68,6 +68,12 @@ class Transaction
     protected $name;
 
     /**
+     * See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes 
+     * @var string
+     */
+    protected $transactionCode;
+
+    /**
      * Get booking date.
      *
      * @deprecated Use getBookingDate() instead
@@ -353,6 +359,30 @@ class Transaction
     public function setName($name)
     {
         $this->name = (string) $name;
+
+        return $this;
+    }
+
+    /**
+     * Get see https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
+     *
+     * @return  string
+     */ 
+    public function getTransactionCode()
+    {
+        return $this->transactionCode;
+    }
+
+    /**
+     * Set see https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
+     *
+     * @param  string  $transactionCode  See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
+     *
+     * @return  self
+     */ 
+    public function setTransactionCode(string $transactionCode)
+    {
+        $this->transactionCode = $transactionCode;
 
         return $this;
     }

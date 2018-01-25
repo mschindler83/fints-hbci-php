@@ -98,32 +98,36 @@ class MT940
 
                     // short form for better handling
                     $trx = &$result[$this->soaDate]['transactions'];
-
-                    preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)([A-Z]{1})?([^N]+)N/', $transaction, $trxMatch);
-
+                    $currentTrx = &$trx[count($trx)];
+                    
+                    preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)[A-Z]?([^N]+)N(...)?/', $transaction, $trxMatch);
+                    
                     switch($trxMatch[2]) {
                         case 'C':
-                            $trx[count($trx)]['credit_debit'] = static::CD_CREDIT;
+                            $currentTrx['credit_debit'] = static::CD_CREDIT;
                             break;
                         case 'D':
-                            $trx[count($trx)]['credit_debit'] = static::CD_DEBIT;
+                            $currentTrx['credit_debit'] = static::CD_DEBIT;
                             break;
                         case 'RC':
-                            $trx[count($trx)]['credit_debit'] = static::CD_CREDIT_CANCELLATION;
+                            $currentTrx['credit_debit'] = static::CD_CREDIT_CANCELLATION;
                             break;
                         case 'RD':
-                            $trx[count($trx)]['credit_debit'] = static::CD_DEBIT_CANCELLATION;
+                            $currentTrx['credit_debit'] = static::CD_DEBIT_CANCELLATION;
                             break;
                         default:
-                            throw new MT940Exception('cd mark not found in: ' . $transaction);
+                            throw new MT940Exception('c/d/rc/rd mark not found in: ' . $transaction);
                     }
-
-                    $amount = $trxMatch[4];
+                    
+                    $amount = $trxMatch[3];
                     $amount = str_replace(',', '.', $amount);
-                    $trx[count($trx) - 1]['amount'] = floatval($amount);
+                    $currentTrx['amount'] = floatval($amount);
+
+                    $code = count($trxMatch) > 4 ? $trxMatch[4] : "";
+                    $currentTrx['transaction_code'] = $code;
 
                     $description = $this->parseDescription($description);
-                    $trx[count($trx) - 1]['description'] = $description;
+                    $currentTrx['description'] = $description;
 
                     // :61:1605110509D198,02NMSCNONREF
                     // 16 = year
@@ -146,8 +150,8 @@ class MT940
                         $bookingDate = $this->soaDate;
                     }
 
-                    $trx[count($trx) - 1]['booking_date'] = $bookingDate;
-                    $trx[count($trx) - 1]['valuta_date'] = $valutaDate;
+                    $currentTrx['booking_date'] = $bookingDate;
+                    $currentTrx['valuta_date'] = $valutaDate;
                 }
             }
         }
@@ -228,7 +232,6 @@ class MT940
         $result['name']              = trim($prepared[32] . $prepared[33]);
         $result['text_key_addition'] = trim($prepared[34]);
         $result['description_2']     = trim($description2);
-
         return $result;
     }
 
