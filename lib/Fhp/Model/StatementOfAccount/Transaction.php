@@ -10,6 +10,8 @@ class Transaction
 {
     const CD_CREDIT = 'credit';
     const CD_DEBIT = 'debit';
+    const CD_CREDIT_CANCELLATION = 'credit_cancellation';
+    const CD_DEBIT_CANCELLATION = 'debit_cancellation';
 
     /**
      * @var \DateTime|null
@@ -131,6 +133,22 @@ class Transaction
         $this->valutaDate = $date;
 
         return $this;
+    }
+
+    /**
+     * Get the signed amount based on credit/debit setting.
+     * Debits and canceled credits have a negative sign.
+     * @return float
+     */
+    public function getSignedAmount()
+    {
+        switch ($this->creditDebit) {
+            case Transaction::CD_DEBIT:
+            case Transaction::CD_CREDIT_CANCELLATION:
+                return -1 * $this->amount;
+            default:
+                return $this->amount;
+        }
     }
 
     /**
@@ -287,7 +305,7 @@ class Transaction
         if (array_key_exists('SVWZ', $this->structuredDescription)) {
             return $this->structuredDescription['SVWZ'];
         } else {
-            return "";
+            return '';
         }
     }
 
