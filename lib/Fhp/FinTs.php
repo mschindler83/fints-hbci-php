@@ -18,6 +18,7 @@ use Fhp\Response\GetStatementOfAccount;
 use Fhp\Segment\HKKAZ;
 use Fhp\Segment\HKSAL;
 use Fhp\Segment\HKSPA;
+use Fhp\Segment\HKVVB;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -50,6 +51,10 @@ class FinTs
     protected $systemId = 0;
     /** @var string */
     protected $bankName;
+    /** @var string  */
+    protected $dialogProductName = HKVVB::DEFAULT_PRODUCT_NAME;
+    /** @var string  */
+    protected $dialogProductVersion = HKVVB::DEFAULT_PRODUCT_VERSION;
 
     /**
      * FinTs constructor.
@@ -99,6 +104,18 @@ class FinTs
     }
 
     /**
+     * Sets the product information, used in Dialog/HKVVB
+     *
+     * @param $name
+     * @param $version
+     */
+    public function setDialogProductInformation($name, $version) {
+
+        $this->dialogProductName = $name;
+        $this->dialogProductVersion = $version;
+    }
+
+    /**
      * Gets array of all accounts.
      *
      * @return Model\Account[]
@@ -106,7 +123,7 @@ class FinTs
     public function getAccounts()
     {
         $dialog = $this->getDialog();
-        $result = $dialog->syncDialog();
+        $result = $dialog->syncDialog($this->dialogProductName, $this->dialogProductVersion);
         $this->bankName = $dialog->getBankName();
         $accounts = new GetAccounts($result);
 
@@ -123,8 +140,8 @@ class FinTs
     public function getSEPAAccounts()
     {
         $dialog = $this->getDialog();
-        $dialog->syncDialog();
-        $dialog->initDialog();
+        $dialog->syncDialog($this->dialogProductName, $this->dialogProductVersion);
+        $dialog->initDialog($this->dialogProductName, $this->dialogProductVersion);
 
         $message = $this->getNewMessage(
             $dialog,
@@ -147,7 +164,7 @@ class FinTs
     public function getBankName()
     {
         if (null == $this->bankName) {
-            $this->getDialog()->syncDialog();
+            $this->getDialog()->syncDialog($this->dialogProductName, $this->dialogProductVersion);
         }
 
         return $this->bankName;
@@ -171,8 +188,8 @@ class FinTs
         $this->logger->info('End date  : ' . $to->format('Y-m-d'));
 
         $dialog = $this->getDialog();
-        $dialog->syncDialog();
-        $dialog->initDialog();
+        $dialog->syncDialog($this->dialogProductName, $this->dialogProductVersion);
+        $dialog->initDialog($this->dialogProductName, $this->dialogProductVersion);
 
         $message = $this->createStateOfAccountMessage($dialog, $account, $from, $to, null);
         $response = $dialog->sendMessage($message);
@@ -318,8 +335,8 @@ class FinTs
     public function getSaldo(SEPAAccount $account)
     {
         $dialog = $this->getDialog();
-        $dialog->syncDialog();
-        $dialog->initDialog();
+        $dialog->syncDialog($this->dialogProductName, $this->dialogProductVersion);
+        $dialog->initDialog($this->dialogProductName, $this->dialogProductVersion);
 
         switch ((int) $dialog->getHksalMaxVersion()) {
             case 4:

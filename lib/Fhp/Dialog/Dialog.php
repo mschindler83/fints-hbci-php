@@ -262,11 +262,11 @@ class Dialog
      * @throws FailedRequestException
      * @throws \Exception
      */
-    public function initDialog()
+    public function initDialog($productName, $productVersion)
     {
         $this->logger->info('Initialize Dialog');
         $identification = new HKIDN(3, $this->bankCode, $this->username, $this->systemId);
-        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT);
+        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT, $productName, $productVersion);
 
         $message = new Message(
             $this->bankCode,
@@ -300,7 +300,7 @@ class Dialog
      * @throws FailedRequestException
      * @throws \Exception
      */
-    public function syncDialog()
+    public function syncDialog($productName, $productVersion)
     {
         $this->logger->info('Initialize SYNC');
         $this->messageNumber = 1;
@@ -308,7 +308,7 @@ class Dialog
         $this->dialogId = 0;
 
         $identification = new HKIDN(3, $this->bankCode, $this->username, 0);
-        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT);
+        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT, $productName, $productVersion);
         $sync           = new HKSYN(5);
 
         $syncMsg = new Message(
