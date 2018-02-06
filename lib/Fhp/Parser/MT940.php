@@ -100,35 +100,34 @@ class MT940
                     $trx = &$result[$this->soaDate]['transactions'];
                     $currentTrx = &$trx[count($trx)];
                     
-                    preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)[A-Z]?([^N]+)N(...)?/', $transaction, $trxMatch);
+                    preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)[A-Z]?([^N]+)N/', $transaction, $trxMatch);
                     
                     switch($trxMatch[2]) {
                         case 'C':
-                            $currentTrx['credit_debit'] = static::CD_CREDIT;
-                            break;
+                        $currentTrx['credit_debit'] = static::CD_CREDIT;
+                        break;
                         case 'D':
-                            $currentTrx['credit_debit'] = static::CD_DEBIT;
-                            break;
+                        $currentTrx['credit_debit'] = static::CD_DEBIT;
+                        break;
                         case 'RC':
-                            $currentTrx['credit_debit'] = static::CD_CREDIT_CANCELLATION;
-                            break;
+                        $currentTrx['credit_debit'] = static::CD_CREDIT_CANCELLATION;
+                        break;
                         case 'RD':
-                            $currentTrx['credit_debit'] = static::CD_DEBIT_CANCELLATION;
-                            break;
+                        $currentTrx['credit_debit'] = static::CD_DEBIT_CANCELLATION;
+                        break;
                         default:
-                            throw new MT940Exception('c/d/rc/rd mark not found in: ' . $transaction);
+                        throw new MT940Exception('c/d/rc/rd mark not found in: ' . $transaction);
                     }
                     
                     $amount = $trxMatch[3];
                     $amount = str_replace(',', '.', $amount);
                     $currentTrx['amount'] = floatval($amount);
-
-                    $code = count($trxMatch) > 4 ? $trxMatch[4] : "";
-                    $currentTrx['transaction_code'] = $code;
+                    
+                    $currentTrx['transaction_code'] = substr($description, 0, 3);
 
                     $description = $this->parseDescription($description);
                     $currentTrx['description'] = $description;
-
+                    
                     // :61:1605110509D198,02NMSCNONREF
                     // 16 = year
                     // 0511 = valuta date

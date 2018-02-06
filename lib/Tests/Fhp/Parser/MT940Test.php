@@ -31,7 +31,7 @@ class MT940Test extends \PHPUnit_Framework_TestCase
 			$result['2017-04-28']['transactions'][0]['description']['description_1']
 		);
 		$this->assertEquals(
-			'062',
+			'166',
 			$result['2017-04-28']['transactions'][0]['transaction_code']
 		);
 		$this->assertEquals(
