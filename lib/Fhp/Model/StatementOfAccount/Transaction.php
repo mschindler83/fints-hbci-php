@@ -398,7 +398,7 @@ class Transaction
      *
      * @return  self
      */ 
-    public function setTransactionCode(string $transactionCode)
+    public function setTransactionCode($transactionCode)
     {
         $this->transactionCode = $transactionCode;
 
