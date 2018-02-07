@@ -28,15 +28,15 @@ class MT940Test extends \PHPUnit_Framework_TestCase
 		$result = $parser->parse(MT940::TARGET_ARRAY);
 		$this->assertEquals(
 			'EREF+CCB.122.UE.266455SVWZ+Re 17-H-0005 vom 24.04.2017',
-			$result['2017-04-28']['transactions'][0]['description']['description_1']
+			$result[0]['transactions'][0]['description']['description_1']
 		);
 		$this->assertEquals(
 			'166',
-			$result['2017-04-28']['transactions'][0]['transaction_code']
+			$result[0]['transactions'][0]['transaction_code']
 		);
 		$this->assertEquals(
 			'223.72',
-			$result['2017-04-28']['transactions'][0]['amount']
+			$result[0]['transactions'][0]['amount']
 		);
 	}
 }
