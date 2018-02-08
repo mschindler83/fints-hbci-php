@@ -35,7 +35,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('name', $obj->setName('name')->getName());
     }
     
-    public function test_get_signed_amount() {
+    public function test_get_signed_amount()
+    {
         $obj = new Transaction();
         $this->assertSame(-20.00, $obj->setCreditDebit(Transaction::CD_DEBIT)->setAmount(20.00)->getSignedAmount());
         $this->assertSame(-20.00, $obj->setCreditDebit(Transaction::CD_CREDIT_CANCELLATION)->setAmount(20.00)->getSignedAmount());

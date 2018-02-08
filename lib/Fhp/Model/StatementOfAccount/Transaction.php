@@ -70,7 +70,7 @@ class Transaction
     protected $name;
 
     /**
-     * See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes 
+     * See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
      * @var string
      */
     protected $transactionCode;
@@ -385,7 +385,7 @@ class Transaction
      * Get see https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
      *
      * @return  string
-     */ 
+     */
     public function getTransactionCode()
     {
         return $this->transactionCode;
@@ -397,7 +397,7 @@ class Transaction
      * @param  string  $transactionCode  See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
      *
      * @return  self
-     */ 
+     */
     public function setTransactionCode($transactionCode)
     {
         $this->transactionCode = $transactionCode;
