@@ -58,36 +58,36 @@ class MT940
 
         $divider = "(@@|\r\n)";
         $result = array();
-        $days = preg_split('/' . $divider . '-' . $divider . '/', $this->rawData);
+        $statementBlocks = preg_split('/' . $divider . '-' . $divider . '/', $this->rawData);
 
-        foreach ($days as $day) {
-            $day = preg_split('/' . $divider . ':/', $day);
+        foreach ($statementBlocks as $statementBlock) {
+            $parts = preg_split('/' . $divider . ':/', $statementBlock);
             $statement = array();
             $transactions = array();
             $cnt = 0;
-            for ($i = 0, $cnt = count($day); $i < $cnt; $i++) {
+            for ($i = 0, $cnt = count($parts); $i < $cnt; $i++) {
                 // handle start balance
                 // 60F:C160401EUR1234,56
-                if (preg_match('/^60(F|M):/', $day[$i])) {
+                if (preg_match('/^60(F|M):/', $parts[$i])) {
                     // remove 60(F|M): for better parsing
-                    $day[$i] = substr($day[$i], 4);
-                    $this->soaDate = $this->getDate(substr($day[$i], 1, 6));
+                    $parts[$i] = substr($parts[$i], 4);
+                    $this->soaDate = $this->getDate(substr($parts[$i], 1, 6));
 
-                    $amount = str_replace(',', '.', substr($day[$i], 10));
+                    $amount = str_replace(',', '.', substr($parts[$i], 10));
                     $statement['start_balance'] = array(
                         'amount' => $amount,
-                        'credit_debit' => (substr($day[$i], 0, 1) == 'C') ? static::CD_CREDIT : static::CD_DEBIT
+                        'credit_debit' => (substr($parts[$i], 0, 1) == 'C') ? static::CD_CREDIT : static::CD_DEBIT
                     );
                     $statement['date'] = $this->soaDate;
                 } elseif (
                     // found transaction
                     // trx:61:1603310331DR637,39N033NONREF
-                    0 === strpos($day[$i], '61:')
-                    && isset($day[$i + 1])
-                    && 0 === strpos($day[$i + 1], '86:')
+                    0 === strpos($parts[$i], '61:')
+                    && isset($parts[$i + 1])
+                    && 0 === strpos($parts[$i + 1], '86:')
                 ) {
-                    $transaction = substr($day[$i], 3);
-                    $description = substr($day[$i + 1], 3);
+                    $transaction = substr($parts[$i], 3);
+                    $description = substr($parts[$i + 1], 3);
 
                     $currentTrx = array();
 
