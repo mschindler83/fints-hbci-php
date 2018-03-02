@@ -6,9 +6,9 @@ use Fhp\Parser\Exception\MT940Exception;
 
 /**
  * Class MT940
- * 
+ *
  * See https://www.kontopruef.de/mt940s.shtml for field documentation
- * 
+ *
  * @package Fhp\Parser
  */
 class MT940
@@ -60,7 +60,6 @@ class MT940
 	 */
 	protected function parseToArray()
 	{
-		
 		$result = array();
 
 		// split at every :20: ("Die Felder ":20:" bis ":28:" müssen vor jedem Zwischensaldo ausgegeben werden.")
@@ -177,7 +176,7 @@ class MT940
 		$descr = preg_replace('/' . self::LINE_DIVIDER . '/', '', $descr);
 		$descr = preg_replace('/  +/', ' ', $descr);
 		$descr = str_replace('? ', '?', $descr);
-		preg_match_all('/\?[ \r\n]*(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
+		preg_match_all('/\?[\r\n]*(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
 
 		$descriptionLines = array();
 		$description1 = ''; // Legacy, could be removed.
