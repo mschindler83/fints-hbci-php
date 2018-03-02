@@ -20,6 +20,9 @@ class MT940
 	const CD_CREDIT_CANCELLATION = 'credit_cancellation';
 	const CD_DEBIT_CANCELLATION = 'debit_cancellation';
 
+	// The divider can be either \r\n or @@
+	const LINE_DIVIDER = "(@@|\r\n)";
+
 	/** @var string */
 	protected $rawData;
 	/** @var string */
@@ -57,16 +60,14 @@ class MT940
 	 */
 	protected function parseToArray()
 	{
-		// The divider can be either \r\n or @@
-
-		$divider = "(@@|\r\n)";
+		
 		$result = array();
 
 		// split at every :20: ("Die Felder ":20:" bis ":28:" müssen vor jedem Zwischensaldo ausgegeben werden.")
-		$statementBlocks = preg_split('/' . $divider . ':20:.*?' . $divider . '/', $this->rawData);
+		$statementBlocks = preg_split('/' . self::LINE_DIVIDER . ':20:.*?' . self::LINE_DIVIDER . '/', $this->rawData);
 
 		foreach ($statementBlocks as $statementBlock) {
-			$parts = preg_split('/' . $divider . ':/', $statementBlock);
+			$parts = preg_split('/' . self::LINE_DIVIDER . ':/', $statementBlock);
 			$statement = array();
 			$transactions = array();
 			$cnt = 0;
@@ -173,9 +174,10 @@ class MT940
 			$prepared[$i] = null;
 		}
 
-		$descr = str_replace("\r\n", '', $descr);
+		$descr = preg_replace('/' . self::LINE_DIVIDER . '/', '', $descr);
+		$descr = preg_replace('/  +/', ' ', $descr);
 		$descr = str_replace('? ', '?', $descr);
-		preg_match_all('/\?[\r\n]*(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
+		preg_match_all('/\?[ \r\n]*(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
 
 		$descriptionLines = array();
 		$description1 = ''; // Legacy, could be removed.
