@@ -277,7 +277,7 @@ This library is verified to work with following banks.
 - [ ] Münsterländische Bank Thie & Co
 - [ ] Murgtalbank Mitteltal - Obertal -alt-
 - [ ] Müritz-Sparkasse
-- [ ] Nassauische Sparkasse 
+- [X] Nassauische Sparkasse 
 - [ ] National-Bank
 - [ ] net-m privatbank 1891 AG
 - [ ] netbank AG
@@ -1071,7 +1071,7 @@ This library is verified to work with following banks.
 - [ ] Stuttgarter Volksbank
 - [ ] Südwestbank
 - [ ] Sydbank A/S
-- [ ] Taunus-Sparkasse
+- [x] Taunus-Sparkasse
 - [x] Triodos Bank Deutschland
 - [ ] Uhlbacher Bank
 - [ ] UniCredit Bank - HypoVereinsbank AG
