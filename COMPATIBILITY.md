@@ -45,6 +45,7 @@ This library is verified to work with following banks.
 - [x] Bankhaus Rautenschlein
 - [ ] Bankverein Bebra
 - [ ] Bankverein Werther AG
+- [ ] Barclays Bank PLC
 - [ ] Bayerische Landesbank Girozentrale
 - [x] BBBank
 - [ ] Bensberger Bank eG
