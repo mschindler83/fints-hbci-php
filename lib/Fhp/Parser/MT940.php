@@ -168,9 +168,9 @@ class MT940
             $index = (int) $m[1];
             if ((20 <= $index && $index <= 29) || (60 <= $index && $index <= 63)) {
                 if (20 <= $index && $index <= 29) {
-                    $description1 .= $m[2];
+                    $description1 .= $m[2] . PHP_EOL;
                 } else {
-                    $description2 .= $m[2];
+                    $description2 .= $m[2] . PHP_EOL;
                 }
                 $m[2] = trim($m[2]);
                 if (!empty($m[2])) {
