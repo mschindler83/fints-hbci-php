@@ -1014,7 +1014,7 @@ This library is verified to work with following banks.
 - [ ] Stadt- und Kreissparkasse Rothenburg
 - [ ] Stadt-Sparkasse Düsseldorf 
 - [ ] Stadt-Sparkasse Haan (Rheinland)
-- [ ] Stadt-Sparkasse Langenfeld
+- [x] Stadt-Sparkasse Langenfeld
 - [ ] Stadt-Sparkasse Solingen 
 - [ ] Stadtsparkasse Aichach-Schrobenhausen
 - [x] Stadtsparkasse Augsburg
