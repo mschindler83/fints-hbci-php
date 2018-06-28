@@ -70,6 +70,15 @@ class Statement
         return $this->startBalance;
     }
 
+    public function getSignedStartBalance()
+    {
+        $s = 1;
+        if ($this->getCreditDebit() == self::CD_DEBIT) {
+            $s = -1;
+        }
+        return $s * $this->getStartBalance();
+    }
+
     /**
      * Set startBalance
      *

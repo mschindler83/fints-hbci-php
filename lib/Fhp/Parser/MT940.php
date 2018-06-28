@@ -6,228 +6,244 @@ use Fhp\Parser\Exception\MT940Exception;
 
 /**
  * Class MT940
+ *
+ * See https://www.kontopruef.de/mt940s.shtml for field documentation
+ *
  * @package Fhp\Parser
  */
 class MT940
 {
-    const TARGET_ARRAY = 0;
+	const TARGET_ARRAY = 0;
 
-    const CD_CREDIT = 'credit';
-    const CD_DEBIT = 'debit';
+	const CD_CREDIT = 'credit';
+	const CD_DEBIT = 'debit';
+	const CD_CREDIT_CANCELLATION = 'credit_cancellation';
+	const CD_DEBIT_CANCELLATION = 'debit_cancellation';
 
-    /** @var string */
-    protected $rawData;
-    /** @var string */
-    protected $soaDate;
+	// The divider can be either \r\n or @@
+	const LINE_DIVIDER = "(@@|\r\n)";
 
-    /**
-     * MT940 constructor.
-     *
-     * @param string $rawData
-     */
-    public function __construct($rawData)
-    {
-        $this->rawData = (string) $rawData;
-    }
+	/** @var string */
+	protected $rawData;
+	/** @var string */
+	protected $soaDate;
 
-    /**
-     * @param string $target
-     * @return array
-     * @throws MT940Exception
-     */
-    public function parse($target)
-    {
-        switch ($target) {
-            case static::TARGET_ARRAY:
-                return $this->parseToArray();
-                break;
-            default:
-                throw new MT940Exception('Invalid parse type provided');
-        }
-    }
+	/**
+	 * MT940 constructor.
+	 *
+	 * @param string $rawData
+	 */
+	public function __construct($rawData)
+	{
+		$this->rawData = (string) $rawData;
+	}
 
-    /**
-     * @return array
-     * @throws MT940Exception
-     */
-    protected function parseToArray()
-    {
-        // The divider can be either \r\n or @@
-        $divider = substr_count($this->rawData, "\r\n-") > substr_count($this->rawData, '@@-') ? "\r\n" : '@@';
+	/**
+	 * @param string $target
+	 * @return array
+	 * @throws MT940Exception
+	 */
+	public function parse($target)
+	{
+		switch ($target) {
+		case static::TARGET_ARRAY:
+			return $this->parseToArray();
+			break;
+		default:
+			throw new MT940Exception('Invalid parse type provided');
+		}
+	}
 
-        $result = array();
-        $days = preg_split('%' . $divider . '-$%', $this->rawData);
-        foreach ($days as &$day) {
-            $day = explode($divider . ':', $day);
-            for ($i = 0, $cnt = count($day); $i < $cnt; $i++) {
-                // handle start balance
-                // 60F:C160401EUR1234,56
-                if (preg_match('/^60(F|M):/', $day[$i])) {
-                    // remove 60(F|M): for better parsing
-                    $day[$i] = substr($day[$i], 4);
-                    $this->soaDate = $this->getDate(substr($day[$i], 1, 6));
+	/**
+	 * @return array
+	 * @throws MT940Exception
+	 */
+	protected function parseToArray()
+	{
+		$result = array();
 
-                    if (!isset($result[$this->soaDate])) {
-                        $result[$this->soaDate] = array('start_balance' => array());
-                    }
+		// split at every :20: ("Die Felder ":20:" bis ":28:" müssen vor jedem Zwischensaldo ausgegeben werden.")
+		$statementBlocks = preg_split('/' . self::LINE_DIVIDER . ':20:.*?' . self::LINE_DIVIDER . '/', $this->rawData);
 
-                    $cdMark = substr($day[$i], 0, 1);
-                    if ($cdMark == 'C') {
-                        $result[$this->soaDate]['start_balance']['credit_debit'] = static::CD_CREDIT;
-                    } elseif ($cdMark == 'D') {
-                        $result[$this->soaDate]['start_balance']['credit_debit'] = static::CD_DEBIT;
-                    }
+		foreach ($statementBlocks as $statementBlock) {
+			$parts = preg_split('/' . self::LINE_DIVIDER . ':/', $statementBlock);
+			$statement = array();
+			$transactions = array();
+			$cnt = 0;
+			for ($i = 0, $cnt = count($parts); $i < $cnt; $i++) {
+				// handle start balance
+				// 60F:C160401EUR1234,56
+				if (preg_match('/^60[FM]:/', $parts[$i])) {
+					$parts[$i] = substr($parts[$i], 4);
+					$this->soaDate = $this->getDate(substr($parts[$i], 1, 6));
 
-                    $amount = str_replace(',', '.', substr($day[$i], 10));
-                    $result[$this->soaDate]['start_balance']['amount'] = $amount;
-                } elseif (
-                    // found transaction
-                    // trx:61:1603310331DR637,39N033NONREF
-                    0 === strpos($day[$i], '61:')
-                    && isset($day[$i + 1])
-                    && 0 === strpos($day[$i + 1], '86:')
-                ) {
-                    $transaction = substr($day[$i], 3);
-                    $description = substr($day[$i + 1], 3);
+					$amount = str_replace(',', '.', substr($parts[$i], 10));
+					$statement['start_balance'] = array(
+									'amount' => $amount,
+									'credit_debit' => (substr($parts[$i], 0, 1) == 'C') ? static::CD_CREDIT : static::CD_DEBIT
+							);
+					$statement['date'] = $this->soaDate;
+				} elseif (
+							// found transaction
+							// trx:61:1603310331DR637,39N033NONREF
+							0 === strpos($parts[$i], '61:')
+							&& isset($parts[$i + 1])
+							&& 0 === strpos($parts[$i + 1], '86:')
+					) {
+					$transaction = substr($parts[$i], 3);
+					$description = substr($parts[$i + 1], 3);
 
-                    if (!isset($result[$this->soaDate]['transactions'])) {
-                        $result[$this->soaDate]['transactions'] = array();
-                    }
+					$currentTrx = array();
 
-                    // short form for better handling
-                    $trx = &$result[$this->soaDate]['transactions'];
+					preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)[A-Z]?([^N]+)N/', $transaction, $matches);
 
-                    preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)([A-Z]{1})?([^N]+)N/', $transaction, $trxMatch);
-                    if ($trxMatch[2] == 'C') {
-                        $trx[count($trx)]['credit_debit'] = static::CD_CREDIT;
-                    } elseif ($trxMatch[2] == 'D') {
-                        $trx[count($trx)]['credit_debit'] = static::CD_DEBIT;
-                    } else {
-                        throw new MT940Exception('cd mark not found in: ' . $transaction);
-                    }
+					switch ($matches[2]) {
+							case 'C':
+									$currentTrx['credit_debit'] = static::CD_CREDIT;
+									break;
+							case 'D':
+									$currentTrx['credit_debit'] = static::CD_DEBIT;
+									break;
+							case 'RC':
+									$currentTrx['credit_debit'] = static::CD_CREDIT_CANCELLATION;
+									break;
+							case 'RD':
+									$currentTrx['credit_debit'] = static::CD_DEBIT_CANCELLATION;
+									break;
+							default:
+									throw new MT940Exception('c/d/rc/rd mark not found in: ' . $transaction);
+							}
 
-                    $amount = $trxMatch[4];
-                    $amount = str_replace(',', '.', $amount);
-                    $trx[count($trx) - 1]['amount'] = floatval($amount);
+					$amount = $matches[3];
+					$amount = str_replace(',', '.', $amount);
+					$currentTrx['amount'] = floatval($amount);
 
-                    $description = $this->parseDescription($description);
-                    $trx[count($trx) - 1]['description'] = $description;
+					$currentTrx['transaction_code'] = substr($description, 0, 3);
 
-                    // :61:1605110509D198,02NMSCNONREF
-                    // 16 = year
-                    // 0511 = valuta date
-                    // 0509 = booking date
-                    $year = substr($transaction, 0, 2);
-                    $valutaDate = $this->getDate($year . substr($transaction, 2, 4));
+					$description = $this->parseDescription($description);
+					$currentTrx['description'] = $description;
 
-                    $bookingDate = substr($transaction, 6, 4);
-                    if (preg_match('/^\d{4}$/', $bookingDate)) {
-                        // if valuta date is earlier than booking date, then it must be in the new year.
-                        if (substr($transaction, 2, 2) == '12' && substr($transaction, 6, 2) == '01') {
-                            $year++;
-                        } elseif (substr($transaction, 2, 2) == '01' && substr($transaction, 6, 2) == '12') {
-                            $year--;
-                        }
-                        $bookingDate = $this->getDate($year . $bookingDate);
-                    } else {
-                        // if booking date not set in :61, then we have to take it from :60F
-                        $bookingDate = $this->soaDate;
-                    }
+					// :61:1605110509D198,02NMSCNONREF
+					// 16 = year
+					// 0511 = valuta date
+					// 0509 = booking date
+					$year = substr($transaction, 0, 2);
+					$valutaDate = $this->getDate($year . substr($transaction, 2, 4));
 
-                    $trx[count($trx) - 1]['booking_date'] = $bookingDate;
-                    $trx[count($trx) - 1]['valuta_date'] = $valutaDate;
-                }
-            }
-        }
+					$bookingDate = substr($transaction, 6, 4);
+					if (preg_match('/^\d{4}$/', $bookingDate)) {
+						// if valuta date is earlier than booking date, then it must be in the new year.
+						if (substr($transaction, 2, 2) == '12' && substr($transaction, 6, 2) == '01') {
+							$year++;
+						} elseif (substr($transaction, 2, 2) == '01' && substr($transaction, 6, 2) == '12') {
+							$year--;
+						}
+						$bookingDate = $this->getDate($year . $bookingDate);
+					} else {
+						// if booking date not set in :61, then we have to take it from :60F
+						$bookingDate = $this->soaDate;
+					}
 
-        return $result;
-    }
+					$currentTrx['booking_date'] = $bookingDate;
+					$currentTrx['valuta_date'] = $valutaDate;
 
-    /**
-     * @param string $descr
-     * @return array
-     */
-    protected function parseDescription($descr)
-    {
-        $prepared = array();
-        $result = array();
+					$transactions[] = $currentTrx;
+				}
+			}
+			$statement['transactions'] = $transactions;
+			if (count($transactions) > 0) {
+				$result[] = $statement;
+			}
+		}
 
-        // prefill with empty values
-        for ($i = 0; $i <= 63; $i++) {
-            $prepared[$i] = null;
-        }
+		return $result;
+	}
 
-        $descr = str_replace("\r\n", '', $descr);
-        $descr = str_replace('? ', '?', $descr);
-        preg_match_all('/\?[\r\n]*(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
+	/**
+	 * @param string $descr
+	 * @return array
+	 */
+	protected function parseDescription($descr)
+	{
+		$prepared = array();
+		$result = array();
 
-        $descriptionLines = array();
-        $description1 = ''; // Legacy, could be removed.
-        $description2 = ''; // Legacy, could be removed.
-        foreach ($matches as $m) {
-            $index = (int) $m[1];
-            if ((20 <= $index && $index <= 29) || (60 <= $index && $index <= 63)) {
-                if (20 <= $index && $index <= 29) {
-                    $description1 .= $m[2];
-                } else {
-                    $description2 .= $m[2];
-                }
-                $m[2] = trim($m[2]);
-                if (!empty($m[2])) {
-                    $descriptionLines[] = $m[2];
-                }
-            } else {
-                $prepared[$index] = $m[2];
-            }
-        }
+		// prefill with empty values
+		for ($i = 0; $i <= 63; $i++) {
+			$prepared[$i] = null;
+		}
 
-        $description = array();
-        if (empty($descriptionLines) || strlen($descriptionLines[0]) < 5 || $descriptionLines[0][4] !== '+') {
-            $description['SVWZ'] = implode('', $descriptionLines);
-        } else {
-            $lastType = null;
-            foreach ($descriptionLines as $line) {
-                if (strlen($line) > 5 && $line[4] === '+') {
-                    if ($lastType != null) {
-                        $description[$lastType] = trim($description[$lastType]);
-                    }
-                    $lastType = substr($line, 0, 4);
-                    $description[$lastType] = substr($line, 5);
-                } else {
-                    $description[$lastType] .= $line;
-                }
-                if (strlen($line) < 27) {
-                    // Usually, lines are 27 characters long. In case characters are missing, then it's either the end
-                    // of the current type or spaces have been trimmed from the end. We want to collapse multiple spaces
-                    // into one and we don't want to leave trailing spaces behind. So add a single space here to make up
-                    // for possibly missing spaces, and if it's the end of the type, it will be trimmed off later.
-                    $description[$lastType] .= ' ';
-                }
-            }
-            $description[$lastType] = trim($description[$lastType]);
-        }
+		$descr = preg_replace('/' . self::LINE_DIVIDER . '/', '', $descr);
+		$descr = preg_replace('/  +/', ' ', $descr);
+		$descr = str_replace('? ', '?', $descr);
+		preg_match_all('/\?[\r\n]*(\d{2})([^\?]+)/', $descr, $matches, PREG_SET_ORDER);
 
-        $result['description']       = $description;
-        $result['booking_text']      = trim($prepared[0]);
-        $result['primanoten_nr']     = trim($prepared[10]);
-        $result['description_1']     = trim($description1);
-        $result['bank_code']         = trim($prepared[30]);
-        $result['account_number']    = trim($prepared[31]);
-        $result['name']              = trim($prepared[32] . $prepared[33]);
-        $result['text_key_addition'] = trim($prepared[34]);
-        $result['description_2']     = trim($description2);
+		$descriptionLines = array();
+		$description1 = ''; // Legacy, could be removed.
+		$description2 = ''; // Legacy, could be removed.
+		foreach ($matches as $m) {
+			$index = (int) $m[1];
+			if ((20 <= $index && $index <= 29) || (60 <= $index && $index <= 63)) {
+				if (20 <= $index && $index <= 29) {
+					$description1 .= $m[2];
+				} else {
+					$description2 .= $m[2];
+				}
+				$m[2] = trim($m[2]);
+				if (!empty($m[2])) {
+					$descriptionLines[] = $m[2];
+				}
+			} else {
+				$prepared[$index] = $m[2];
+			}
+		}
 
-        return $result;
-    }
+		$description = array();
+		if (empty($descriptionLines) || strlen($descriptionLines[0]) < 5 || $descriptionLines[0][4] !== '+') {
+			$description['SVWZ'] = implode('', $descriptionLines);
+		} else {
+			$lastType = null;
+			foreach ($descriptionLines as $line) {
+				if (strlen($line) > 5 && $line[4] === '+') {
+					if ($lastType != null) {
+						$description[$lastType] = trim($description[$lastType]);
+					}
+					$lastType = substr($line, 0, 4);
+					$description[$lastType] = substr($line, 5);
+				} else {
+					$description[$lastType] .= $line;
+				}
+				if (strlen($line) < 27) {
+					// Usually, lines are 27 characters long. In case characters are missing, then it's either the end
+					// of the current type or spaces have been trimmed from the end. We want to collapse multiple spaces
+					// into one and we don't want to leave trailing spaces behind. So add a single space here to make up
+					// for possibly missing spaces, and if it's the end of the type, it will be trimmed off later.
+					$description[$lastType] .= ' ';
+				}
+			}
+			$description[$lastType] = trim($description[$lastType]);
+		}
 
-    /**
-     * @param string $val
-     * @return string
-     */
-    protected function getDate($val)
-    {
-        $val = '20' . $val;
-        preg_match('/(\d{4})(\d{2})(\d{2})/', $val, $m);
-        return $m[1] . '-' . $m[2] . '-' . $m[3];
-    }
+		$result['description']       = $description;
+		$result['booking_text']      = trim($prepared[0]);
+		$result['primanoten_nr']     = trim($prepared[10]);
+		$result['description_1']     = trim($description1);
+		$result['bank_code']         = trim($prepared[30]);
+		$result['account_number']    = trim($prepared[31]);
+		$result['name']              = trim($prepared[32] . $prepared[33]);
+		$result['text_key_addition'] = trim($prepared[34]);
+		$result['description_2']     = trim($description2);
+		return $result;
+	}
+
+	/**
+	 * @param string $val
+	 * @return string
+	 */
+	protected function getDate($val)
+	{
+		$val = '20' . $val;
+		preg_match('/(\d{4})(\d{2})(\d{2})/', $val, $m);
+		return $m[1] . '-' . $m[2] . '-' . $m[3];
+	}
 }
