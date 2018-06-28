@@ -875,7 +875,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Kierspe-Meinerzhagen
 - [ ] Sparkasse Kleve
 - [ ] Sparkasse Koblenz 
-- [ ] Sparkasse KölnBonn 
+- [x] Sparkasse KölnBonn 
 - [ ] Sparkasse Kraichgau (Bruchsal-Bretten-Sinsheim)
 - [x] Sparkasse Krefeld 
 - [ ] Sparkasse Kulmbach-Kronach
