@@ -281,7 +281,7 @@ This library is verified to work with following banks.
 - [X] Nassauische Sparkasse 
 - [ ] National-Bank
 - [ ] net-m privatbank 1891 AG
-- [ ] netbank AG
+- [ ] netbank AG -> did not work!
 - [ ] NF Bank 
 - [ ] NIBC Bank Zndl Frankfurt am Main
 - [ ] NL Bank Volks- und Raiffeisenbank eG
@@ -774,7 +774,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Aschaffenburg-Alzenau
 - [ ] Sparkasse Attendorn-Lennestadt-Kichhundern
 - [ ] Sparkasse Aurich-Norden
-- [ ] Sparkasse Bad Hersfeld-Rotenburg
+- [x] Sparkasse Bad Hersfeld-Rotenburg
 - [ ] Sparkasse Bad Kissingen
 - [ ] Sparkasse Bad Neustadt a. d. Saale
 - [ ] Sparkasse Bad Tölz-Wolfratshausen
