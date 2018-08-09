@@ -910,7 +910,7 @@ This library is verified to work with following banks.
 - [ ] Sparkasse Mittelholstein AG
 - [ ] Sparkasse Mittelmosel-Eifel-Mosel-Hunsrück
 - [ ] Sparkasse Mittelsachsen
-- [ ] Sparkasse Mittelthüringen
+- [X] Sparkasse Mittelthüringen
 - [ ] Sparkasse Moosburg
 - [ ] Sparkasse Muldental
 - [ ] Sparkasse Mülheim a.d. Ruhr 
