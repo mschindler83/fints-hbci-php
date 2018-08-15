@@ -222,7 +222,7 @@ This library is verified to work with following banks.
 - [ ] Kreissparkasse Osterholz
 - [ ] Kreissparkasse Peine
 - [x] Kreissparkasse Ravensburg
-- [ ] Kreissparkasse Recklinghausen
+- [x] Kreissparkasse Recklinghausen
 - [ ] Kreissparkasse Reutlingen
 - [ ] Kreissparkasse Rhein-Hunsrück
 - [ ] Kreissparkasse Rottweil
