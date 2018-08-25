@@ -1523,6 +1523,7 @@ This library is verified to work with following banks.
 - [ ] Volksbank Strohgäu
 - [ ] Volksbank Stuhr eG
 - [ ] Volksbank Stutensee Hardt
+- [x] Volksbank Stuttgart eG
 - [x] Volksbank Südheide
 - [ ] Volksbank Sulingen eG
 - [ ] Volksbank Sulmtal
