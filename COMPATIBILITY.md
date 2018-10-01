@@ -533,6 +533,7 @@ This library is verified to work with following banks.
 - [ ] Raiffeisenbank Leezen eG
 - [ ] Raiffeisenbank Lorup eG
 - [x] Raiffeisenbank Maintal Ndl d Frankfurter VB
+- [x] Raiffeisenbank Main-Spessart
 - [ ] Raiffeisenbank Maitis
 - [ ] Raiffeisenbank Malchin eG
 - [ ] Raiffeisenbank Mangfalltal -alt-
