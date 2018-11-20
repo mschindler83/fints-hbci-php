@@ -286,7 +286,7 @@ This library is verified to work with following banks.
 - [ ] NIBC Bank Zndl Frankfurt am Main
 - [ ] NL Bank Volks- und Raiffeisenbank eG
 - [ ] Nord-Ostsee Sparkasse
-- [ ] Nord/LB Hannover
+- [X] Nord/LB Hannover / Norddeutsche Landesbank Girozentrale
 - [ ] Norderstedter Bank eG
 - [ ] Nordthüringer Volksbank
 - [ ] norisbank GmbH
