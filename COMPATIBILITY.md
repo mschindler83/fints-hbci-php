@@ -73,6 +73,7 @@ This library is verified to work with following banks.
 - [ ] Cash Express Gesellschaft f Finanz-u Reisedienstleistungen
 - [x] comdirect bank AG
 - [ ] Commerzbank
+- [x] Consorsbank
 - [ ] Crailsheimer Volksbank -alt-
 - [ ] Credit- und Volksbank eG
 - [x] Cronbank
