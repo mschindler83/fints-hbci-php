@@ -80,7 +80,7 @@ This library is verified to work with following banks.
 - [ ] Darmsheimer Bank
 - [ ] Degussa Bank AG
 - [ ] Dettinger Bank
-- [ ] Deutsche Apotheker- und Ärztebank eG
+- [x] Deutsche Apotheker- und Ärztebank eG
 - [ ] Deutsche Bank AG
 - [x] Deutsche Bank Privat und Geschäftskunden AG
 - [ ] Deutsche Genossenschafts-Hypothekenbank AG
