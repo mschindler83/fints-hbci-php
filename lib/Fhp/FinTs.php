@@ -53,11 +53,12 @@ class FinTs
 
     /**
      * FinTs constructor.
-     * @param string $server
-     * @param int $port
-     * @param string $bankCode
-     * @param string $username
-     * @param string $pin
+     * @param string $server Base URL (should start with https://) where the bank's server can be reached.
+     * @param int $port The port to use for the connection. Use 443 for HTTPS.
+     * @param string $bankCode The bank's identifier (Bankleitzahl).
+     * @param string $username The username for authentication. This is assigned by the bank initially, but most banks
+     *     allow users to customize it.
+     * @param string $pin The PIN for authentication.
      * @param LoggerInterface|null $logger
      */
     public function __construct(
