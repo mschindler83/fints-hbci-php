@@ -85,6 +85,16 @@ class Dialog
     protected $hkkazVersion = 6;
 
     /**
+     * @var string
+     */
+    protected $productName;
+
+    /**
+     * @var string
+     */
+    protected $productVersion;
+
+    /**
      * Dialog constructor.
      *
      * @param Connection $connection
@@ -92,15 +102,19 @@ class Dialog
      * @param string $username
      * @param string $pin
      * @param string $systemId
+     * @param string $productName
+     * @param string $productVersion
      * @param LoggerInterface $logger
      */
-    public function __construct(Connection $connection, $bankCode, $username, $pin, $systemId, LoggerInterface $logger)
+    public function __construct(Connection $connection, $bankCode, $username, $pin, $systemId, $productName, $productVersion, LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->bankCode = $bankCode;
         $this->username = $username;
         $this->pin = $pin;
         $this->systemId = $systemId;
+        $this->productName = $productName;
+        $this->productVersion = $productVersion;
         $this->logger = $logger;
     }
 
@@ -266,7 +280,9 @@ class Dialog
     {
         $this->logger->info('Initialize Dialog');
         $identification = new HKIDN(3, $this->bankCode, $this->username, $this->systemId);
-        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT);
+        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION,
+            HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT,
+            $this->productName, $this->productVersion);
 
         $message = new Message(
             $this->bankCode,
@@ -308,7 +324,9 @@ class Dialog
         $this->dialogId = 0;
 
         $identification = new HKIDN(3, $this->bankCode, $this->username, 0);
-        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT);
+        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION,
+            HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT,
+            $this->productName, $this->productVersion);
         $sync           = new HKSYN(5);
 
         $syncMsg = new Message(

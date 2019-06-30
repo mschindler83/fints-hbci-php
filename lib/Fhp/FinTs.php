@@ -50,6 +50,10 @@ class FinTs
     protected $systemId = 0;
     /** @var string */
     protected $bankName;
+    /** @var string */
+    protected $productName;
+    /** @var string */
+    protected $productVersion;
 
     /**
      * FinTs constructor.
@@ -59,6 +63,12 @@ class FinTs
      * @param string $username The username for authentication. This is assigned by the bank initially, but most banks
      *     allow users to customize it.
      * @param string $pin The PIN for authentication.
+     * @param string $productName Identifies the product (i.e. the application in which the fints-hbci-php library is
+     *     being used). This is used to show users which products/applications have access to their bank account. Note
+     *     that this shouldn't just be an arbitrary string, but rather the registration number obtained from the
+     *     registration on https://www.hbci-zka.de/register/prod_register.htm.
+     * @param string $productVersion The product version, which can be an arbitrary string, though if your the
+     *     application displays a version number somewhere on its own user interface, it should match that.
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -67,6 +77,8 @@ class FinTs
         $bankCode,
         $username,
         $pin,
+        $productName,
+        $productVersion,
         LoggerInterface $logger = null
     ) {
         $this->server = $server;
@@ -83,6 +95,9 @@ class FinTs
         // HBCI special chars.
         $this->username = $this->escapeString($username);
         $this->pin = $this->escapeString($pin);
+
+        $this->productName = $productName;
+        $this->productVersion = $productVersion;
 
         $this->adapter = new Curl($this->server, $this->port);
         $this->connection = new Connection($this->adapter);
@@ -413,6 +428,8 @@ class FinTs
             $this->username,
             $this->pin,
             $this->systemId,
+            $this->productName,
+            $this->productVersion,
             $this->logger
         );
     }
