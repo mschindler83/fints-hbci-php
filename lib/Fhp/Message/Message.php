@@ -92,7 +92,8 @@ class Message extends AbstractMessage
         $dialogId = 0,
         $messageNumber = 0,
         array $encryptedSegments = array(),
-        array $options = array()
+        array $options = array(),
+		$tan = null
     ) {
         $this->securityReference = rand(1000000, 9999999);
         $this->dialogId = $dialogId;
@@ -105,7 +106,7 @@ class Message extends AbstractMessage
         $this->profileVersion = SecurityProfile::PROFILE_VERSION_1;
         $this->securityFunction = HNSHK::SECURITY_FUNC_999;
 
-        if (isset($options[static::OPT_PINTAN_MECH]) && !empty($this->options[static::OPT_PINTAN_MECH])) {
+        if(isset($options[static::OPT_PINTAN_MECH])) {
             if (!in_array('999', $this->options[static::OPT_PINTAN_MECH])) {
                 $this->profileVersion = SecurityProfile::PROFILE_VERSION_2;
                 $this->securityFunction = $this->options[static::OPT_PINTAN_MECH][0];
@@ -128,7 +129,7 @@ class Message extends AbstractMessage
 
         $curCount = count($encryptedSegments) + 3;
 
-        $signatureEnd = new HNSHA($curCount, $this->securityReference, $this->pin);
+        $signatureEnd = new HNSHA($curCount, $this->securityReference, $this->pin, $tan);
         $this->addEncryptedSegment($signatureEnd);
         $this->addSegment(new HNHBS($curCount + 1, $this->messageNumber));
     }

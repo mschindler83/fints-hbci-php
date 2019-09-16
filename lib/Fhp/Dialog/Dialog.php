@@ -1,17 +1,18 @@
 <?php
 namespace Fhp\Dialog;
 
-use Fhp\Adapter\Exception\AdapterException;
-use Fhp\Adapter\Exception\CurlException;
+use Fhp\CurlException;
 use Fhp\Connection;
 use Fhp\Dialog\Exception\FailedRequestException;
 use Fhp\Message\AbstractMessage;
 use Fhp\Message\Message;
 use Fhp\Response\Initialization;
 use Fhp\Response\Response;
+use Fhp\Response\GetTANRequest;
 use Fhp\Segment\HKEND;
 use Fhp\Segment\HKIDN;
 use Fhp\Segment\HKSYN;
+use Fhp\Segment\HKTAN;
 use Fhp\Segment\HKVVB;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -85,6 +86,16 @@ class Dialog
     protected $hkkazVersion = 6;
 
     /**
+     * @var string
+     */
+    protected $productName;
+
+    /**
+     * @var string
+     */
+    protected $productVersion;
+
+    /**
      * Dialog constructor.
      *
      * @param Connection $connection
@@ -93,46 +104,103 @@ class Dialog
      * @param string $pin
      * @param string $systemId
      * @param LoggerInterface $logger
+     * @param string $productName
+     * @param string $productVersion
      */
-    public function __construct(Connection $connection, $bankCode, $username, $pin, $systemId, LoggerInterface $logger)
-    {
+    public function __construct(
+        Connection $connection,
+        $bankCode,
+        $username,
+        $pin, $systemId,
+        LoggerInterface $logger,
+        $productName,
+        $productVersion
+    ) {
         $this->connection = $connection;
         $this->bankCode = $bankCode;
         $this->username = $username;
         $this->pin = $pin;
         $this->systemId = $systemId;
         $this->logger = $logger;
+        $this->productName = $productName;
+        $this->productVersion = $productVersion;
     }
 
     /**
      * @param AbstractMessage $message
-     * @return Response
-     * @throws AdapterException
+	 * @param \Closure $tanCallback
+	 * @param $interval
+     * @return Response|GetTANRequest
      * @throws CurlException
      * @throws FailedRequestException
      */
-    public function sendMessage(AbstractMessage $message)
+    public function sendMessage(AbstractMessage $message, $tanMechanism = null, \Closure $tanCallback = null, $interval = 1)
     {
         try {
-            $this->logger->info('Sending Message');
+			$this->logger->debug("> ".$message);
             $message->setMessageNumber($this->messageNumber);
             $message->setDialogId($this->dialogId);
 
             $result = $this->connection->send($message);
             $this->messageNumber++;
-            $response = new Response($result);
-
+			
+			$this->logger->debug("< ".$result);
+			
+            $response = new Response($result, $this);
             $this->handleResponse($response);
-
+            #$this->logger->info('Response reads:');
+			#$this->logger->info($response->rawResponse);
+			
             if (!$response->isSuccess()) {
-                $summary = $response->getMessageSummary();
+                $summaryS = $response->getSegmentSummary();
+                $summaryM = $response->getMessageSummary();
+				
+				$summary = array();
+				foreach($summaryS AS $k => $v)
+					$summary[$k] = $v;
+				
+				foreach($summaryM AS $k => $v){
+					if(isset($summary[$k]))
+						$summary[$k] .= "($v)";
+					else
+						$summary[$k] = $v;
+				}
+				
                 $ex = new FailedRequestException($summary);
                 $this->logger->error($ex->getMessage());
                 throw $ex;
             }
 
+			$hitan = $response->splitSegment($response->findSegment("HITAN"));
+			
+			if(!isset($hitan[4]) OR $hitan[4] == "nochallenge")
+				return $response;
+			
+			$response = new GetTANRequest($response->rawResponse, $this);
+			
+			if(!$tanCallback)
+				return $response;
+			
+			$this->logger->info("Waiting max. 120 seconds for TAN from callback. Checking every $interval second(s)...");
+			for($i = 0; $i < 120; $i += $interval){
+				sleep($interval);
+
+				$tan = trim($tanCallback());
+				if($tan == ""){
+					$this->logger->info("No TAN found, waiting ".(120 - $i)."!");
+					continue;
+				}
+
+				break;
+			}
+
+			if($tan == "")
+				throw new TANException("No TAN received!");
+
+			$response = $this->submitTAN($response, $tanMechanism, $tan);
+			
             return $response;
-        } catch (AdapterException $e) {
+        } catch (\Exception $e) {
             $this->logger->critical($e->getMessage());
             if ($e instanceof CurlException) {
                 $this->logger->debug(print_r($e->getCurlInfo(), true));
@@ -142,8 +210,34 @@ class Dialog
         }
     }
 
+	public function submitTAN($response, $tanMechanism, $tan){
+		$message = new Message(
+			$this->bankCode,
+			$this->username,
+			$this->pin,
+			$this->getSystemId(),
+			$this->getDialogId(),
+			$this->getMessageNumber(),
+			array(
+				new HKTAN(HKTAN::VERSION, 3, $response->get()->getProcessID())
+			),
+			array(
+				AbstractMessage::OPT_PINTAN_MECH => $tanMechanism
+			),
+			$tan
+		);
+
+		$this->logger->info('');
+		$this->logger->info('HKTAN (Zwei-Schritt-TAN-Einreichung) initialize');
+		$response = $this->sendMessage($message);
+		$this->logger->info('HKTAN end');
+		
+		return $response;
+	}
+	
     /**
      * @param Response $response
+     * @throws \Exception
      */
     protected function handleResponse(Response $response)
     {
@@ -157,6 +251,7 @@ class Dialog
         foreach ($segSum as $code => $message) {
             $this->logMessage('HIRMS', $code, $message);
         }
+		#$this->logger->log(LogLevel::INFO, "");
     }
 
     /**
@@ -257,16 +352,25 @@ class Dialog
      * Initializes a dialog.
      *
      * @return string|null
-     * @throws AdapterException
      * @throws CurlException
      * @throws FailedRequestException
      * @throws \Exception
      */
     public function initDialog()
     {
-        $this->logger->info('Initialize Dialog');
+        $this->logger->info('');
+        $this->logger->info('DIALOG initialize');
+        $this->logger->debug('Registered product: ' . trim($this->productName . ' ' . $this->productVersion));
+
         $identification = new HKIDN(3, $this->bankCode, $this->username, $this->systemId);
-        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT);
+        $prepare        = new HKVVB(
+            4,
+            HKVVB::DEFAULT_BPD_VERSION,
+            HKVVB::DEFAULT_UPD_VERSION,
+            HKVVB::LANG_DEFAULT,
+            $this->productName,
+            $this->productVersion
+        );
 
         $message = new Message(
             $this->bankCode,
@@ -275,56 +379,101 @@ class Dialog
             $this->systemId,
             0,
             1,
-            array($identification, $prepare),
+            array(
+				$identification, 
+				$prepare,
+				new HKTAN(HKTAN::VERSION, 5)
+			),
             array(AbstractMessage::OPT_PINTAN_MECH => $this->supportedTanMechanisms)
         );
 
-        $this->logger->debug('Sending INIT message: ' . (string) $message);
+        #$this->logger->debug('Sending INIT message:');
+        #$this->logger->debug((string) $message);
 
         $response = $this->sendMessage($message)->rawResponse;
-        $this->logger->debug('Got INIT response: ' . $response);
+        #$this->logger->debug('Got INIT response:');
+        #$this->logger->debug($response);
 
         $result = new Initialization($response);
         $this->dialogId = $result->getDialogId();
         $this->logger->info('Received dialog ID: ' . $this->dialogId);
 
+        $this->logger->info('DIALOG end');
+		
         return $this->dialogId;
     }
 
     /**
      * Sends sync request.
      *
+     * @param boolean
      * @return string
-     * @throws AdapterException
      * @throws CurlException
      * @throws FailedRequestException
      * @throws \Exception
      */
-    public function syncDialog()
+    public function syncDialog($endDialog = true, $sendHKTan = true, $tanMechanism = null)
     {
-        $this->logger->info('Initialize SYNC');
+		
+        $this->logger->info('');
+        $this->logger->info('SYNC initialize');
         $this->messageNumber = 1;
         $this->systemId = 0;
         $this->dialogId = 0;
 
         $identification = new HKIDN(3, $this->bankCode, $this->username, 0);
-        $prepare        = new HKVVB(4, HKVVB::DEFAULT_BPD_VERSION, HKVVB::DEFAULT_UPD_VERSION, HKVVB::LANG_DEFAULT);
-        $sync           = new HKSYN(5);
-
-        $syncMsg = new Message(
-            $this->bankCode,
-            $this->username,
-            $this->pin,
-            $this->systemId,
-            $this->dialogId,
-            $this->messageNumber,
-            array($identification, $prepare, $sync)
+        $prepare        = new HKVVB(
+            4,
+            HKVVB::DEFAULT_BPD_VERSION,
+            HKVVB::DEFAULT_UPD_VERSION,
+            HKVVB::LANG_DEFAULT,
+            $this->productName,
+            $this->productVersion
         );
 
-        $this->logger->debug('Sending SYNC message: ' . (string) $syncMsg);
+		if($sendHKTan){
+			$options = array();
+			if($tanMechanism)
+				$options[AbstractMessage::OPT_PINTAN_MECH] = array($tanMechanism);
+			
+			$syncMsg = new Message(
+				$this->bankCode,
+				$this->username,
+				$this->pin,
+				$this->systemId,
+				$this->dialogId,
+				$this->messageNumber,
+				array(
+					$identification,
+					$prepare, 
+					new HKTAN(HKTAN::VERSION, 5),
+					new HKSYN(6)
+				),
+				$options
+			);
+		} else
+			$syncMsg = new Message(
+				$this->bankCode,
+				$this->username,
+				$this->pin,
+				$this->systemId,
+				$this->dialogId,
+				$this->messageNumber,
+				array(
+					$identification,
+					$prepare, 
+					new HKSYN(5)
+				)
+			);
+
+        #$this->logger->debug('Sending SYNC message:');
+        #$this->logger->debug((string) $syncMsg);
         $response = $this->sendMessage($syncMsg);
 
-        $this->logger->debug('Got SYNC response: ' . $response->rawResponse);
+		#$this->checkResponse($response);
+
+        #$this->logger->debug('Received SYNC response:');
+        #$this->logger->debug($response->rawResponse);
 
         // save BPD (Bank Parameter Daten)
         $this->systemId = $response->getSystemId();
@@ -342,22 +491,32 @@ class Dialog
         $this->logger->info('Received dialog id: ' . $response->getDialogId());
         $this->logger->info('Supported TAN mechanisms: ' . implode(', ', $this->supportedTanMechanisms));
 
-        $this->endDialog();
+		if($endDialog)
+		    $this->endDialog();
 
-        return $response->rawResponse;
+        $this->logger->info('SYNC end');
+		
+        return $response;
     }
 
+	/*public function checkResponse(Response $response){
+		foreach($response->getSegmentSummary() AS $k => $v)
+			if(substr($k, 0, 1) == "9")
+				throw new \Exception($v, $k);
+		
+	}*/
+	
     /**
      * Ends a previous started dialog.
      *
      * @return string
-     * @throws AdapterException
      * @throws CurlException
      * @throws FailedRequestException
      */
     public function endDialog()
     {
-        $this->logger->info('Initialize END dialog message');
+        $this->logger->info('');
+        $this->logger->info('END initialize');
 
         $endMsg = new Message(
             $this->bankCode,
@@ -371,13 +530,15 @@ class Dialog
             )
         );
 
-        $this->logger->debug('Sending END message: ' . (string) $endMsg);
+        #$this->logger->debug("S ".(string) $endMsg);
         $response = $this->sendMessage($endMsg);
-        $this->logger->debug('Got END response: ' . $response->rawResponse);
+        #$this->logger->debug("R ".$response->rawResponse);
 
         $this->logger->info('Resetting dialog ID and message number count');
         $this->dialogId = 0;
         $this->messageNumber = 1;
+		
+        $this->logger->info('END end');
 
         return $response->rawResponse;
     }

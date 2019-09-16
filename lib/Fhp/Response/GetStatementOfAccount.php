@@ -61,21 +61,37 @@ class GetStatementOfAccount extends Response
             $statementModel->setCreditDebit($statement['start_balance']['credit_debit']);
             $statementOfAccount->addStatement($statementModel);
 
-            foreach ($statement['transactions'] as $trx) {
-                $transaction = new Transaction();
-                $transaction->setBookingDate(new \DateTime($trx['booking_date']));
-                $transaction->setValutaDate(new \DateTime($trx['valuta_date']));
-                $transaction->setCreditDebit($trx['credit_debit']);
-                $transaction->setAmount($trx['amount']);
-                $transaction->setTransactionCode($trx['transaction_code']);
-                $transaction->setBookingText($trx['description']['booking_text']);
-                $transaction->setDescription1($trx['description']['description_1']);
-                $transaction->setDescription2($trx['description']['description_2']);
-                $transaction->setStructuredDescription($trx['description']['description']);
-                $transaction->setBankCode($trx['description']['bank_code']);
-                $transaction->setAccountNumber($trx['description']['account_number']);
-                $transaction->setName($trx['description']['name']);
-                $statementModel->addTransaction($transaction);
+            if (isset($statement['transactions'])) {
+                foreach ($statement['transactions'] as $trx) {
+					$replaceIn = array(
+						'booking_text',
+						'description_1',
+						'description_2',
+						'description',
+						'name'
+					);
+					foreach($replaceIn AS $k)
+						if(isset($trx['description'][$k]))
+							$trx['description'][$k] = str_replace ("@@", "", $trx['description'][$k]);
+
+                    $transaction = new Transaction();
+                    $transaction->setBookingDate(new \DateTime($trx['booking_date']));
+                    $transaction->setValutaDate(new \DateTime($trx['valuta_date']));
+                    $transaction->setTurnoverDataRaw($trx['turnover_raw']);
+                    $transaction->setMultiPurposeDataRaw($trx['multi_purpose_raw']);
+                    $transaction->setCreditDebit($trx['credit_debit']);
+                    $transaction->setAmount($trx['amount']);
+				    $transaction->setTransactionCode($trx['transaction_code']);
+                    $transaction->setBookingCode($trx['description']['booking_code']);
+                    $transaction->setBookingText($trx['description']['booking_text']);
+                    $transaction->setDescription1($trx['description']['description_1']);
+                    $transaction->setDescription2($trx['description']['description_2']);
+                    $transaction->setStructuredDescription($trx['description']['description']);
+                    $transaction->setBankCode($trx['description']['bank_code']);
+                    $transaction->setAccountNumber($trx['description']['account_number']);
+                    $transaction->setName($trx['description']['name']);
+                    $statementModel->addTransaction($transaction);
+                }
             }
         }
 
@@ -88,7 +104,7 @@ class GetStatementOfAccount extends Response
      * @param array $array
      * @return StatementOfAccount
      */
-    protected static function createModelFromArray(array $array)
+    public static function createModelFromArray(array $array)
     {
         $soa = static::addFromArray($array, new StatementOfAccount());
 

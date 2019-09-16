@@ -95,6 +95,9 @@ class MT940
 
 					$currentTrx = array();
 
+					$currentTrx['turnover_raw'] = ':' . $parts[$i];
+					$currentTrx['multi_purpose_raw'] = ':' . $parts[$i + 1];
+
 					preg_match('/^\d{6}(\d{4})?(C|D|RC|RD)[A-Z]?([^N]+)N/', $transaction, $matches);
 
 					switch ($matches[2]) {
@@ -129,29 +132,17 @@ class MT940
 					// 0509 = booking date
 					$year = substr($transaction, 0, 2);
 					$valutaDate = $this->getDate($year . substr($transaction, 2, 4));
+					$bookingDateMonthDay = substr($transaction, 6, 4);
 
-					$bookingDate = substr($transaction, 6, 4);
-					if (preg_match('/^\d{4}$/', $bookingDate)) {
-						// if valuta date is earlier than booking date, then it must be in the new year.
-						if (substr($transaction, 2, 2) == '12' && substr($transaction, 6, 2) == '01') {
-							$year++;
-						} elseif (substr($transaction, 2, 2) == '01' && substr($transaction, 6, 2) == '12') {
-							$year--;
-						}
-						$bookingDate = $this->getDate($year . $bookingDate);
-					} else {
-						// if booking date not set in :61, then we have to take it from :60F
-						$bookingDate = $this->soaDate;
-					}
-
-					$currentTrx['booking_date'] = $bookingDate;
+					$currentTrx['booking_date'] = $this->determineBookingDate($year, $valutaDate, $bookingDateMonthDay);
 					$currentTrx['valuta_date'] = $valutaDate;
 
 					$transactions[] = $currentTrx;
 				}
 			}
 			$statement['transactions'] = $transactions;
-			if (count($transactions) > 0) {
+			if (count($transactions) > 0 && array_key_exists('start_balance', $statement)) {
+				// $statement['start_balance'] is not set for earmarked transaction blocks
 				$result[] = $statement;
 			}
 		}
@@ -159,12 +150,35 @@ class MT940
 		return $result;
 	}
 
-	/**
-	 * @param string $descr
-	 * @return array
-	 */
+	protected function determineBookingDate($year, $valutaDate, $bookingDateMonthDay)
+	{
+		$result = null;
+		if (!preg_match('/^\d{4}$/', $bookingDateMonthDay)) {
+			// if booking date not set in :61, then we have to take it from :60F
+			return $this->soaDate;
+		}
+		// see https://github.com/mschindler83/fints-hbci-php/issues/101
+		$vd_date = new \DateTime($valutaDate);
+		$minDiff = null;
+		for ($bookingYear = $year - 1; $bookingYear <= $year + 1; $bookingYear++) {
+			$bd = $this->getDate($bookingYear . $bookingDateMonthDay);
+			$bd_date = new \DateTime($bd);
+			$diff = $bd_date->diff($vd_date)->days;
+			if ($diff === 0) {
+				return $bd; // shortcut
+			} elseif (null === $minDiff || $diff < $minDiff) {
+				$minDiff = $diff;
+				$result = $bd;
+			}
+		}
+		return $result;
+	}
+
 	protected function parseDescription($descr)
 	{
+		// Geschäftsvorfall-Code
+		$gvc = substr($descr, 0, 3);
+
 		$prepared = array();
 		$result = array();
 
@@ -198,13 +212,38 @@ class MT940
 			}
 		}
 
+		$description = $this->extractStructuredDataFromRemittanceLines($descriptionLines, $gvc, $prepared);
+
+		$result['booking_code']      = $gvc;
+		$result['booking_text']      = trim($prepared[0]);
+		$result['description']       = $description;
+		$result['primanoten_nr']     = trim($prepared[10]);
+		$result['description_1']     = trim($description1);
+		$result['bank_code']         = trim($prepared[30]);
+		$result['account_number']    = trim($prepared[31]);
+		$result['name']              = trim($prepared[32] . $prepared[33]);
+		$result['text_key_addition'] = trim($prepared[34]);
+		$result['description_2']     = $description2;
+		$result['desc_lines']        = $descriptionLines;
+
+		return $result;
+	}
+
+	/**
+	 * @param string[] $lines that contain the remittance information
+	 * @param string $gvc Geschätsvorfallcode; Out-Parameter, might be changed from information in remittance info
+	 * @param string $rawLines All the lines in the Multi-Purpose-Field 86; Out-Parameter, might be changed from information in remittance info
+	 * @return array
+	 */
+	protected function extractStructuredDataFromRemittanceLines($descriptionLines, &$gvc, &$rawLines)
+	{
 		$description = array();
 		if (empty($descriptionLines) || strlen($descriptionLines[0]) < 5 || $descriptionLines[0][4] !== '+') {
 			$description['SVWZ'] = implode('', $descriptionLines);
 		} else {
 			$lastType = null;
 			foreach ($descriptionLines as $line) {
-				if (strlen($line) > 5 && $line[4] === '+') {
+				if (strlen($line) >= 5 && $line[4] === '+') {
 					if ($lastType != null) {
 						$description[$lastType] = trim($description[$lastType]);
 					}
@@ -224,16 +263,7 @@ class MT940
 			$description[$lastType] = trim($description[$lastType]);
 		}
 
-		$result['description']       = $description;
-		$result['booking_text']      = trim($prepared[0]);
-		$result['primanoten_nr']     = trim($prepared[10]);
-		$result['description_1']     = trim($description1);
-		$result['bank_code']         = trim($prepared[30]);
-		$result['account_number']    = trim($prepared[31]);
-		$result['name']              = trim($prepared[32] . $prepared[33]);
-		$result['text_key_addition'] = trim($prepared[34]);
-		$result['description_2']     = trim($description2);
-		return $result;
+		return $description;
 	}
 
 	/**

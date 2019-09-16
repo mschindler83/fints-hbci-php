@@ -10,8 +10,8 @@ class Transaction
 {
     const CD_CREDIT = 'credit';
     const CD_DEBIT = 'debit';
-    const CD_CREDIT_CANCELLATION = 'credit_cancellation';
-    const CD_DEBIT_CANCELLATION = 'debit_cancellation';
+	const CD_CREDIT_CANCELLATION = 'credit_cancellation';
+	const CD_DEBIT_CANCELLATION = 'debit_cancellation';
 
     /**
      * @var \DateTime|null
@@ -32,6 +32,21 @@ class Transaction
      * @var string
      */
     protected $creditDebit;
+
+	/**
+		 * @var string
+		 */
+	protected $turnoverDataRaw;
+
+	/**
+	 * @var string
+	 */
+	protected $multiPurposeDataRaw;
+
+    /**
+     * @var string
+     */
+    protected $bookingCode;
 
     /**
      * @var string
@@ -70,10 +85,9 @@ class Transaction
     protected $name;
 
     /**
-     * See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
-     * @var string
+     * @var boolean
      */
-    protected $transactionCode;
+	protected $booked;
 
     /**
      * Get booking date.
@@ -134,21 +148,20 @@ class Transaction
 
         return $this;
     }
-
-    /**
-     * Get the signed amount based on credit/debit setting.
-     * Debits and canceled credits have a negative sign.
-     * @return float
-     */
-    public function getSignedAmount()
-    {
-        switch ($this->creditDebit) {
-            case Transaction::CD_DEBIT:
-            case Transaction::CD_CREDIT_CANCELLATION:
-                return -1 * $this->amount;
-            default:
-                return $this->amount;
-        }
+	/**
+	 * Get the signed amount based on credit/debit setting.
+	 * Debits and canceled credits have a negative sign.
+	 * @return float
+	 */
+	public function getSignedAmount()
+	{
+		switch ($this->creditDebit) {
+			case Transaction::CD_DEBIT:
+			case Transaction::CD_CREDIT_CANCELLATION:
+				return -1 * $this->amount;
+			default:
+				return $this->amount;
+		}
     }
 
     /**
@@ -159,6 +172,22 @@ class Transaction
     public function getAmount()
     {
         return $this->amount;
+    }
+
+
+
+    /**
+     * Set booked status
+     *
+     * @param boolean $booked
+     *
+     * @return $this
+     */
+    public function setBooked($booked)
+    {
+        $this->booked = $booked;
+
+        return $this;
     }
 
     /**
@@ -195,6 +224,30 @@ class Transaction
     public function setCreditDebit($creditDebit)
     {
         $this->creditDebit = $creditDebit;
+
+        return $this;
+    }
+
+    /**
+     * Get bookingCode
+     *
+     * @return string
+     */
+    public function getBookingCode()
+    {
+        return $this->bookingCode;
+    }
+
+    /**
+     * Set bookingCode
+     *
+     * @param string $bookingCode
+     *
+     * @return $this
+     */
+    public function setBookingCode($bookingCode)
+    {
+        $this->bookingCode = (string) $bookingCode;
 
         return $this;
     }
@@ -305,7 +358,21 @@ class Transaction
         if (array_key_exists('SVWZ', $this->structuredDescription)) {
             return $this->structuredDescription['SVWZ'];
         } else {
-            return '';
+            return "";
+        }
+    }
+
+    /**
+     * Get the end to end id (EREF)
+     *
+     * @return string
+     */
+    public function getEndToEndID()
+    {
+        if (array_key_exists('EREF', $this->structuredDescription)) {
+            return $this->structuredDescription['EREF'];
+        } else {
+            return "";
         }
     }
 
@@ -367,41 +434,99 @@ class Transaction
         return $this->name;
     }
 
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = (string) $name;
+	/**
+	 * Set name
+	 *
+	 * @param string $name
+	 *
+	 * @return $this
+	 */
+	public function setName($name)
+	{
+		$this->name = (string) $name;
 
-        return $this;
-    }
+		return $this;
+	}
 
-    /**
-     * Get see https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
-     *
-     * @return  string
-     */
-    public function getTransactionCode()
-    {
-        return $this->transactionCode;
-    }
+	/**
+	 * Get see https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
+	 *
+	 * @return  string
+	 */
+	public function getTransactionCode()
+	{
+		return $this->transactionCode;
+	}
 
-    /**
-     * Set see https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
-     *
-     * @param  string  $transactionCode  See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
-     *
-     * @return  self
-     */
-    public function setTransactionCode($transactionCode)
-    {
-        $this->transactionCode = $transactionCode;
+	/**
+	 * Set see https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
+	 *
+	 * @param  string  $transactionCode  See https://www.bayernlb.de/internet/media/de/ir/downloads_1/zahlungsverkehr/formate_1/MT940_942.pdf page 451 / 8.2.6 Geschäftsvorfallcodes
+	 *
+	 * @return  self
+	 */
+	public function setTransactionCode($transactionCode)
+	{
+		$this->transactionCode = $transactionCode;
 
-        return $this;
-    }
+		return $this;
+	}
+
+	/**
+	 * Get the value of turnoverDataRaw
+	 *
+	 * @return  string
+	 */
+	public function getTurnoverDataRaw()
+	{
+		return $this->turnoverDataRaw;
+	}
+
+	/**
+	 * Set the value of turnoverDataRaw
+	 *
+	 * @param  string  $turnoverDataRaw
+	 *
+	 * @return  self
+	 */
+	public function setTurnoverDataRaw($turnoverDataRaw)
+	{
+		$this->turnoverDataRaw = $turnoverDataRaw;
+
+		return $this;
+	}
+
+	/**
+	 * Get the value of multiPurposeDataRaw
+	 *
+	 * @return  string
+	 */
+	public function getMultiPurposeDataRaw()
+	{
+		return $this->multiPurposeDataRaw;
+	}
+
+	/**
+	 * Set the value of multiPurposeDataRaw
+	 *
+	 * @param  string  $multiPurposeDataRaw
+	 *
+	 * @return  self
+	 */
+	public function setMultiPurposeDataRaw($multiPurposeDataRaw)
+	{
+		$this->multiPurposeDataRaw = $multiPurposeDataRaw;
+
+		return $this;
+	}
+
+	/**
+	 * Get booked status
+	 *
+	 * @return boolean
+	 */
+	public function getBooked()
+	{
+		return $this->booked;
+	}
 }

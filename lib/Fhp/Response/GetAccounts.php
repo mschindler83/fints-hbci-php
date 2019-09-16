@@ -24,10 +24,7 @@ class GetAccounts extends Response
 
         foreach ($accounts as $account) {
             $accountParts = $this->splitSegment($account);
-            $account = $this->createModelFromArray($accountParts);
-            if ($account !== null) {
-                $this->accounts[] = $account;
-            }
+            $this->accounts[] = $this->createModelFromArray($accountParts);
         }
 
         return $this->accounts;
@@ -41,9 +38,6 @@ class GetAccounts extends Response
      */
     protected function createModelFromArray(array $array)
     {
-        if (!$array[1]) {
-            return null;
-        }
         $account = new Account();
         list($accountNumber, $x, $countryCode, $bankCode) = explode(':', $array[1]);
         $account->setId($array[1]);
