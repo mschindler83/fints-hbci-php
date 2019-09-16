@@ -174,8 +174,6 @@ class Transaction
         return $this->amount;
     }
 
-
-
     /**
      * Set booked status
      *
