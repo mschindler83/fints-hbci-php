@@ -4,6 +4,7 @@
   "homepage": "http://fints-hbci-php.markus-schindler.de",
   "version": "1.0.4",
   "license": "MIT",
+  "abandoned": "nemiah/php-fints",
   "autoload": {
     "psr-0": {
       "Fhp": "lib/"
